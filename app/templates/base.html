@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% if title %}
+    <title>{{ title }} - Kości</title>
+    {% else %}
+    <title>Strona domowa - Kości</title>
+    {% endif %}
+</head>
+<body>
+    <div>Kości - strona główna <a href="/index">Home</a></div>
+    {% block content %}{% endblock %}
+</body>
+</html>
