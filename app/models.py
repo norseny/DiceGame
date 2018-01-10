@@ -59,7 +59,7 @@ class Gameresult(db.Model):
     result = db.Column(db.Integer)
 
     def __repr__(self):
-        return '<Gameresult {} {}>'.format(self.game_id, self.user_id)
+        return '<Gameresult {} {} {}>'.format(self.game_id, self.user_id, self.result)
 
 
 @login.user_loader

@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Oto kości! Zagraj {{ user.username }}!</h1>
+    <h1>Oto kości! Zagraj {{ current_user.username }}!</h1>
+    {% for gameresult in game_results %}
+    <div><p>{{ gameresult.user.username }} scored {{ gameresult.result }}</p></div>
+    {% endfor %}
 {% endblock %}

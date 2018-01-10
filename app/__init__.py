@@ -10,6 +10,6 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
-login.login_view = 'login' #Flask-Login needs to know what is the view function that handles logins. This can be added in app/__init__.py
+login.login_view = 'login' #Flask-Login needs to know what is the view function that handles logins
 
 from app import routes, models
