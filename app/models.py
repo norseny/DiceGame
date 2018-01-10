@@ -1,16 +1,23 @@
 from app import db
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
+from app import login
 
-
-class Player(db.Model):
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True)
     password_hash = db.Column(db.String(128))
-    game_results = db.relationship('Gameresult', backref='player', lazy='dynamic')
-    game_round = db.relationship('Round', backref='player', lazy='dynamic')
+    game_results = db.relationship('Gameresult', backref='user', lazy='dynamic')
+    game_round = db.relationship('Round', backref='user', lazy='dynamic')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -36,7 +43,7 @@ class Diceroll(db.Model):
 
 class Round(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     game_id = db.Column(db.Integer, db.ForeignKey('game.id'))
     diceroll1_id = db.Column(db.Integer, db.ForeignKey('diceroll.id'))
     diceroll2_id = db.Column(db.Integer, db.ForeignKey('diceroll.id'))
@@ -48,8 +55,13 @@ class Round(db.Model):
 class Gameresult(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     game_id = db.Column(db.Integer, db.ForeignKey('game.id'))
-    player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     result = db.Column(db.Integer)
 
     def __repr__(self):
-        return '<Gameresult {} {}>'.format(self.game_id, self.player_id)
+        return '<Gameresult {} {}>'.format(self.game_id, self.user_id)
+
+
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
