@@ -1,6 +1,6 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, session
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, ThrowForm
+from app.forms import *
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import *
 from werkzeug.urls import url_parse
@@ -56,31 +56,48 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
+@app.route('/newgame', methods=['GET', 'POST'])
+def newgame():
+    form = NewGameForm()
+    if form.validate_on_submit():
+        game = Game(name=form.name.data)
+        db.session.add(game)
+        gameresult = Gameresult(game_id=game.id, user_id=current_user.id)
+        db.session.add(game)
+        db.session.add(gameresult)
+        db.session.commit()
+        flash('New game %s created' % game.name)
+        return redirect(url_for('throw'))
+    return render_template('newgame.html', title='New Game', form=form)
+
+
 @app.route('/throw', methods=['GET', 'POST'])
 def throw():
     dices = []
     form = ThrowForm()
     if form.validate_on_submit():
-
         for i in range(5):
             dices.append(random.randint(1, 6))
         diceroll = Diceroll(dice1=dices[0], dice2=dices[1], dice3=dices[2], dice4=dices[3], dice5=dices[4])
         db.session.add(diceroll)
         db.session.commit()
 
-        firstDiceroll = Diceroll.query.get(diceroll.id) # zapisujemy do zmiennej pierwszy rzut (cały obiekt)
-
-
-
+        firstDiceroll = Diceroll.query.get(diceroll.id)
+        session['firstDicerollId'] = firstDiceroll.id
 
         flash('Dices thrown')
-        # return redirect(url_for('thrown'))
-        return render_template('thrown.html', title='Thrown', dices=dices, dicerollId=dicerollId)
+        #return redirect(url_for('thrown'))
+        return render_template('thrown.html', title='Thrown', dices=dices, firstDicerollId=firstDiceroll.id)
     return render_template('throw.html', title='Throw', form=form)
+
 
 @app.route('/thrown', methods=['GET', 'POST'])
 def thrown():
-    return render_template('thrown.html', title='Thrown')
+    firstDicerollId = session.get('firstDicerollId', None)
+
+    if  firstDicerollId is not None:
+        return render_template('thrown.html', title='Throw', firstDiceroll=firstDicerollId)
+    return render_template('thrown.html', title='Thrown', firstDicerollId='aaa')
 
 
 if __name__ == '__main__':
