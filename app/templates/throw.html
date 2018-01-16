@@ -4,8 +4,51 @@
     <h1>Throw the dices</h1>
     <form action="" method="post">
         {{ form.hidden_tag() }}
+        {% if turn > 1 %}
+            <h2>Thrown dices:</h2>
+            <h3>Diceroll 1:</h3>
+            <p>
+                {% for dice in dices1 %}
+                    Dice{{loop.index}}:{{ dice }}
+                {% endfor %}
+            </p>
+        {% endif %}
+        {% if turn == 2 %}
+            <h3>Diceroll 2:</h3>
+            <p>
+                {% for dice in dices2 %}
+                    Dice{{loop.index}}:{{ dice }}
+                {% endfor %}
+            </p>
+        {% endif %}
+        {% if turn == 3 %}
+            <h3>Diceroll 3:</h3>
+            <p>
+                {% for dice in dices3 %}
+                    Dice{{loop.index}}:{{ dice }}
+                {% endfor %}
+            </p>
+        {% endif %}
+        {% if turn != 1 %}
+            <p>
+                Select the dices you want to throw again:
+            </p>
+            <p>
+                {{ form.dice1.description }}{{ form.dice1 }}
+                {{ form.dice2.description }}{{ form.dice2 }}
+                {{ form.dice3.description }}{{ form.dice3 }}
+                {{ form.dice4.description }}{{ form.dice4 }}
+                {{ form.dice5.description }}{{ form.dice5 }}
+            </p>
+            <p>
+                {{ form.throwsel() }}
+            </p>
+            <p>
+                {{ form.keep() }}
+            </p>
+        {% endif %}
         <p>
-            {{ form.submit() }}
+            {{ form.throwall() }}
         </p>
     </form>
 {% endblock %}

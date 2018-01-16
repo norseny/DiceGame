@@ -34,6 +34,15 @@ class NewGameForm(FlaskForm):
 
 
 class ThrowForm(FlaskForm):
-    submit = SubmitField('Throw 5 dices')
+    dice1 = BooleanField('Dice 1',description='Dice 1:')
+    dice2 = BooleanField('Dice 2',description='Dice 2:')
+    dice3 = BooleanField('Dice 3',description='Dice 3:')
+    dice4 = BooleanField('Dice 4',description='Dice 4:')
+    dice5 = BooleanField('Dice 5',description='Dice 5:')
+
+    throwsel = SubmitField('Throw selected dices again',)
+    throwall = SubmitField('Throw all 5 dices')
+    keep = SubmitField('Keep all the dices and select the category')
+
 
 

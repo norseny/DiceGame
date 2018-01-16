@@ -67,37 +67,87 @@ def newgame():
         db.session.add(gameresult)
         db.session.commit()
         flash('New game %s created' % game.name)
-        return redirect(url_for('throw'))
+        return redirect(url_for('throw', gameid=game.id))
     return render_template('newgame.html', title='New Game', form=form)
 
-
-@app.route('/throw', methods=['GET', 'POST'])
-def throw():
-    dices = []
+@app.route('/throw/<int:gameid>', methods=['GET', 'POST'])
+@app.route('/throw/<int:gameid>/<int:turn>/<dicerollid1>/<dicerollid2>', methods=['GET', 'POST'])
+def throw(gameid, turn=1, dicerollid1=None, dicerollid2= None):
+    oldturn = turn
+    diceroll1 = []
+    diceroll2 = []
+    diceroll3 = []
+    if dicerollid1 is not None:
+        dicerollclass1 = Diceroll.query.filter_by(id=dicerollid1)
+        diceroll1.append(dicerollclass1.dice1)
+        diceroll1.append(dicerollclass1.dice2)
+        diceroll1.append(dicerollclass1.dice3)
+        diceroll1.append(dicerollclass1.dice4)
+        diceroll1.append(dicerollclass1.dice5)
+        if dicerollid2 is not None:
+            dicerollclass2 = Diceroll.query.filter_by(id=dicerollid2)
+            diceroll2.append(dicerollclass2.dice1)
+            diceroll2.append(dicerollclass2.dice2)
+            diceroll2.append(dicerollclass2.dice3)
+            diceroll2.append(dicerollclass2.dice4)
+            diceroll2.append(dicerollclass2.dice5)
     form = ThrowForm()
     if form.validate_on_submit():
-        for i in range(5):
-            dices.append(random.randint(1, 6))
-        diceroll = Diceroll(dice1=dices[0], dice2=dices[1], dice3=dices[2], dice4=dices[3], dice5=dices[4])
-        db.session.add(diceroll)
-        db.session.commit()
+        if form.keep.data:
+            # insert to round model db
+            return redirect(url_for('category',gameid=gameid)) # to complete
+        elif form.throwsel.data:
+            dicerolldb = dicerollclass1
+            if form.dice1.data:
+                dicerolldb.dice1 = random.randint(1, 6)
+            if form.dice2.data:
+                dicerolldb.dice2 = random.randint(1, 6)
+            if form.dice3.data:
+                dicerolldb.dice3 = random.randint(1, 6)
+            if form.dice4.data:
+                dicerolldb.dice5 = random.randint(1, 6)
+            if form.dice5.data:
+                dicerolldb.dice5 = random.randint(1, 6)
+            flash('Selected dices thrown')
+        elif form.throwall.data:
+            if dicerollid1 is None:
+                for i in range(5):
+                    diceroll1.append(random.randint(1, 6))
+                dicerolldb = Diceroll(dice1=diceroll1[0], dice2=diceroll1[1], dice3=diceroll1[2], dice4=diceroll1[3], dice5=diceroll1[4])
+                turn += 1
+                db.session.add(dicerolldb)
+                db.session.commit()
+                return redirect(url_for('throw', gameid=gameid,dicerollid1=dicerolldb.id, dicerollid2=None))
+                # return render_template('throw.html', title='Throw', form=form, turn=turn, dices1=diceroll1, dices2=diceroll2, dices3=diceroll3, dicerollid1=dicerolldb.id, dicerollid2=None)
+            elif (dicerollid1 is not None) and (dicerollid2 is None):
+                for i in range(5):
+                    diceroll2.append(random.randint(1, 6))
+                turn += 1
+                dicerolldb = Diceroll(dice1=diceroll1[0], dice2=diceroll2[1], dice3=diceroll2[2], dice4=diceroll2[3], dice5=diceroll2[4])
+                db.session.add(dicerolldb)
+                db.session.commit()
+                return render_template('throw.html', title='Throw', form=form, turn=turn, dices1=diceroll1, dices2=diceroll2, dices3=diceroll3, dicerollid1=dicerollclass1.id, dicerollid2=dicerolldb.id)
+            elif (dicerollid2 is not None):
+                for i in range(5):
+                    diceroll3.append(random.randint(1, 6))
+                dicerolldb = Diceroll(dice1=diceroll1[0], dice2=diceroll3[1], dice3=diceroll3[2], dice4=diceroll3[3], dice5=diceroll3[4])
+                turn += 1
+                db.session.add(dicerolldb)
+                db.session.commit()
+                return redirect(url_for('category', gameid=gameid))  # to complete
+            flash('All dices thrown')
+        # return render_template('throw.html', title='Throw', form=form, turn=turn,dices1=diceroll1, dices2=diceroll2,dices3=diceroll3,dicerollid1=dicerolldb.id, dicerollid2= None)
+    #return render_template('thrown.html', title='Thrown', dices=dices, firstDicerollId=firstDiceroll.id)
+    return render_template('throw.html', title='Throw', form=form, turn=oldturn, dices1=diceroll1, dices2=diceroll2, dices3=diceroll3)
 
-        firstDiceroll = Diceroll.query.get(diceroll.id)
-        session['firstDicerollId'] = firstDiceroll.id
 
-        flash('Dices thrown')
-        #return redirect(url_for('thrown'))
-        return render_template('thrown.html', title='Thrown', dices=dices, firstDicerollId=firstDiceroll.id)
-    return render_template('throw.html', title='Throw', form=form)
-
-
-@app.route('/thrown', methods=['GET', 'POST'])
-def thrown():
-    firstDicerollId = session.get('firstDicerollId', None)
-
-    if  firstDicerollId is not None:
-        return render_template('thrown.html', title='Throw', firstDiceroll=firstDicerollId)
-    return render_template('thrown.html', title='Thrown', firstDicerollId='aaa')
+@app.route('/thrown<int:gameid>/<int:turn>/<int:dicerollid>', methods=['GET', 'POST'])
+def thrown(gameid, turn, dicerollid):
+    form = ThrowForm()
+    if form.validate_on_submit():
+        if dicerollid is not None:
+            return render_template('thrown.html', title='Throw', dicerollid=dicerollid)
+    return render_template('thrown.html', title='Thrown', dicerollid='aaa')
 
 
 if __name__ == '__main__':

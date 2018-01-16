@@ -43,7 +43,7 @@ class Diceroll(db.Model):
     diceroll3 = db.relationship('Round',backref='diceroll3', lazy='dynamic', foreign_keys = 'Round.diceroll3_id')
 
 
-class Round(db.Model):
+class Round(db.Model): # 'Turn' as round is a function
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     game_id = db.Column(db.Integer, db.ForeignKey('game.id'))
