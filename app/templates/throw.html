@@ -12,7 +12,7 @@
             <h2>Thrown dices:</h2>
             <h3>Diceroll 1:</h3>
             <p>
-                {% for dice in dices1 %}
+                {% for dice in dices_1 %}
                     Dice{{loop.index}}:{{ dice }}
                 {% endfor %}
             </p>
@@ -20,7 +20,7 @@
         {% if turn > 2 %}
             <h3>Diceroll 2:</h3>
             <p>
-                {% for dice in dices2 %}
+                {% for dice in dices_2 %}
                     Dice{{loop.index}}:{{ dice }}
                 {% endfor %}
             </p>
@@ -28,7 +28,7 @@
         {% if turn > 3 %}
             <h3>Diceroll 3:</h3>
             <p>
-                {% for dice in dices3 %}
+                {% for dice in dices_3 %}
                     Dice{{loop.index}}:{{ dice }}
                 {% endfor %}
             </p>
@@ -45,7 +45,7 @@
                 {{ form.dice5.description }}{{ form.dice5 }}
             </p>
             <p>
-                {{ form.throwsel() }}
+                {{ form.throw_sel() }}
             </p>
             <p>
                 {{ form.keep() }}
@@ -53,11 +53,11 @@
         {% endif %}
         {% if turn < 4%}
         <p>
-            {{ form.throwall() }}
+            {{ form.throw_all() }}
         </p>
         {% endif %}
         {% if turn == 4 %}
-            {{ form.catsel() }}
+            {{ form.cat_sel() }}
         {% endif %}
     </form>
 {% endblock %}

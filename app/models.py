@@ -2,6 +2,7 @@ from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login
+import random
 
 
 class User(UserMixin, db.Model):
@@ -41,6 +42,29 @@ class Diceroll(db.Model):
     diceroll1 = db.relationship('Round',backref='diceroll1', lazy='dynamic', foreign_keys = 'Round.diceroll1_id')
     diceroll2 = db.relationship('Round',backref='diceroll2', lazy='dynamic', foreign_keys = 'Round.diceroll2_id')
     diceroll3 = db.relationship('Round',backref='diceroll3', lazy='dynamic', foreign_keys = 'Round.diceroll3_id')
+
+    def return_dices_as_list(self):
+        dices_list = []
+        dices_list.append(self.dice1)
+        dices_list.append(self.dice2)
+        dices_list.append(self.dice3)
+        dices_list.append(self.dice4)
+        dices_list.append(self.dice5)
+        return dices_list
+
+    def turn_dices_list_to_class_attributes(self, dices_list):
+        if len(dices_list) == 5:
+            self.dice1 = dices_list[0]
+            self.dice2 = dices_list[1]
+            self.dice3 = dices_list[2]
+            self.dice4 = dices_list[3]
+            self.dice5 = dices_list[4]
+
+    def generate_all_rand_dices(self):
+        dices_list = []
+        for i in range(5):
+            dices_list.append(random.randint(1, 6))
+        self.turn_dices_list_to_class_attributes(dices_list)
 
 
 class Round(db.Model): # 'Turn' as round is a function

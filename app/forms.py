@@ -34,16 +34,16 @@ class NewGameForm(FlaskForm):
 
 
 class ThrowForm(FlaskForm):
-    dice1 = BooleanField('Dice 1',description='Dice 1:')
+    dice1 = BooleanField('Dice 1',description='Dice 1:') # todo ,default=False) = nie działa, zrobić domyslnie niezaznaczone w kazdej turze
     dice2 = BooleanField('Dice 2',description='Dice 2:')
     dice3 = BooleanField('Dice 3',description='Dice 3:')
     dice4 = BooleanField('Dice 4',description='Dice 4:')
     dice5 = BooleanField('Dice 5',description='Dice 5:')
 
-    throwsel = SubmitField('Throw selected dices again',)
-    throwall = SubmitField('Throw all 5 dices')
+    throw_sel = SubmitField('Throw selected dices again',)
+    throw_all = SubmitField('Throw all 5 dices')
     keep = SubmitField('Keep all the dices and select the category')
-    catsel = SubmitField('Go to category selection')
+    cat_sel = SubmitField('Go to category selection')
 
 
 

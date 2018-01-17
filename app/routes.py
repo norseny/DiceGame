@@ -62,126 +62,89 @@ def newgame():
     if form.validate_on_submit():
         game = Game(name=form.name.data)
         db.session.add(game)
-        gameresult = Gameresult(game_id=game.id, user_id=current_user.id)
+        game_result = Gameresult(game_id=game.id, user_id=current_user.id)
         db.session.add(game)
-        db.session.add(gameresult)
+        db.session.add(game_result)
         db.session.commit()
-        if session.get('dicerollid1'):
-            session.pop('dicerollid1')
-        if session.get('dicerollid2'):
-            session.pop('dicerollid2')
-        if session.get('dicerollid3'):
-            session.pop('dicerollid3')
+        if session.get('diceroll_1_id'): # moze da sie inaczej?
+            session.pop('diceroll_1_id')
+        if session.get('diceroll_2_id'):
+            session.pop('diceroll_2_id')
+        if session.get('diceroll_3_id'):
+            session.pop('diceroll_3_id')
         flash('New game %s created' % game.name)
         return redirect(url_for('throw', gameid=game.id))
     return render_template('newgame.html', title='New Game', form=form)
 
+
 @app.route('/throw/<int:gameid>', methods=['GET', 'POST'])
-def throw(gameid):
+def throw(gameid):      # podzielic funkcję na 3 czesci w zaleznosci od wybranego submita???
     turn = 1
-    diceroll1 = []
-    diceroll2 = []
-    diceroll3 = []
-    if session.get('dicerollid1'):
-        id = session['dicerollid1']
-        dicerollclass1 = Diceroll.query.get(id)
-        diceroll1.append(dicerollclass1.dice1)
-        diceroll1.append(dicerollclass1.dice2)
-        diceroll1.append(dicerollclass1.dice3)
-        diceroll1.append(dicerollclass1.dice4)
-        diceroll1.append(dicerollclass1.dice5)
+    list_diceroll_1, list_diceroll_2, list_diceroll_3 = [], [], []
+    if session.get('diceroll_1_id'):
+        class_diceroll_1 = Diceroll.query.get(session['diceroll_1_id'])
+        list_diceroll_1 = class_diceroll_1.return_dices_as_list()
         turn = 2
-        if session.get('dicerollid2'):
-            id = session['dicerollid2']
-            dicerollclass2 = Diceroll.query.get(id)
-            diceroll2.append(dicerollclass2.dice1)
-            diceroll2.append(dicerollclass2.dice2)
-            diceroll2.append(dicerollclass2.dice3)
-            diceroll2.append(dicerollclass2.dice4)
-            diceroll2.append(dicerollclass2.dice5)
+        if session.get('diceroll_2_id'):
+            class_diceroll_2 = Diceroll.query.get(session['diceroll_2_id'])
+            list_diceroll_2 = class_diceroll_2.return_dices_as_list()
             turn = 3
     form = ThrowForm()
     if form.validate_on_submit():
-        if form.throwsel.data:
-            print('throwsel')
-            if turn > 1 :
-                dicerolldb = Diceroll()
-                if turn ==2:
-                    dicerolldb = dicerollclass1
+        if form.throw_sel.data:
+            if turn > 1:
+                diceroll_to_db = Diceroll()
+                if turn == 2:
+                    diceroll_to_db = class_diceroll_1
                 elif turn == 3:
-                    dicerolldb = dicerollclass2
+                    diceroll_to_db = class_diceroll_2
                 if form.dice1.data:
-                    dicerolldb.dice1 = random.randint(1, 6)
+                    diceroll_to_db.dice1 = random.randint(1, 6)
                 if form.dice2.data:
-                    dicerolldb.dice2 = random.randint(1, 6)
+                    diceroll_to_db.dice2 = random.randint(1, 6)
                 if form.dice3.data:
-                    dicerolldb.dice3 = random.randint(1, 6)
+                    diceroll_to_db.dice3 = random.randint(1, 6)
                 if form.dice4.data:
-                    dicerolldb.dice5 = random.randint(1, 6)
+                    diceroll_to_db.dice5 = random.randint(1, 6)
                 if form.dice5.data:
-                    dicerolldb.dice5 = random.randint(1, 6)
+                    diceroll_to_db.dice5 = random.randint(1, 6)
                 flash('Selected dices thrown')
-                db.session.add(dicerolldb)
+                db.session.add(diceroll_to_db)
                 db.session.commit()
                 if turn == 2:
-                    session['dicerollid2'] = dicerolldb.id
-                    id = session['dicerollid2']
-                    dicerollclass2 = Diceroll.query.get(id)
-                    diceroll2.append(dicerollclass2.dice1)
-                    diceroll2.append(dicerollclass2.dice2)
-                    diceroll2.append(dicerollclass2.dice3)
-                    diceroll2.append(dicerollclass2.dice4)
-                    diceroll2.append(dicerollclass2.dice5)
+                    session['diceroll_2_id'] = diceroll_to_db.id
+                    class_diceroll_2 = Diceroll.query.get(session['diceroll_2_id'])
+                    list_diceroll_2 = class_diceroll_2.return_dices_as_list()
                 elif turn == 3:
-                    session['dicerollid3'] = dicerolldb.id
-                    id = session['dicerollid3']
-                    dicerollclass3 = Diceroll.query.get(id)
-                    diceroll3.append(dicerollclass3.dice1)
-                    diceroll3.append(dicerollclass3.dice2)
-                    diceroll3.append(dicerollclass3.dice3)
-                    diceroll3.append(dicerollclass3.dice4)
-                    diceroll3.append(dicerollclass3.dice5)
+                    session['diceroll_3_id'] = diceroll_to_db.id
+                    class_diceroll_3 = Diceroll.query.get(session['diceroll_3_id'])
+                    list_diceroll_3 = class_diceroll_3.return_dices_as_list()
                 turn += 1
-                return render_template('throw.html', title='Throw', form=form, turn=turn, dices1=diceroll1,dices2=diceroll2, dices3=diceroll3)
-        elif form.throwall.data:
-            if not session.get('dicerollid1'):
-                for i in range(5):
-                    diceroll1.append(random.randint(1, 6))
-                dicerolldb = Diceroll(dice1=diceroll1[0], dice2=diceroll1[1], dice3=diceroll1[2], dice4=diceroll1[3],dice5=diceroll1[4])
-                db.session.add(dicerolldb)
+                return render_template('throw.html', title='Throw', form=form, turn=turn, dices_1=list_diceroll_1,dices_2=list_diceroll_2, dices_3=list_diceroll_3)
+        elif form.throw_all.data:
+            diceroll_to_db = Diceroll()
+            diceroll_to_db.generate_all_rand_dices()
+            if turn == 1:
+                list_diceroll_1 = diceroll_to_db.return_dices_as_list()
+                db.session.add(diceroll_to_db)
                 db.session.commit()
-                session['dicerollid1'] = dicerolldb.id
-            elif session.get('dicerollid1') and (not session.get('dicerollid2')):
-                for i in range(5):
-                    diceroll2.append(random.randint(1, 6))
-                dicerolldb = Diceroll(dice1 = diceroll2[0], dice2=diceroll2[1], dice3=diceroll2[2], dice4=diceroll2[3], dice5=diceroll2[4])
-                db.session.add(dicerolldb)
+                session['diceroll_1_id'] = diceroll_to_db.id
+            elif turn == 2:
+                list_diceroll_2 = diceroll_to_db.return_dices_as_list()
+                db.session.add(diceroll_to_db)
                 db.session.commit()
-                session['dicerollid2'] = dicerolldb.id
-                id = session['dicerollid2']
-            elif session.get('dicerollid2') is not None:
-                for i in range(5):
-                    diceroll3.append(random.randint(1, 6))
-                dicerolldb = Diceroll(dice1=diceroll3[0], dice2=diceroll3[1], dice3=diceroll3[2], dice4=diceroll3[3],dice5=diceroll3[4])
-                db.session.add(dicerolldb)
+                session['diceroll_2_id'] = diceroll_to_db.id
+            elif turn == 3:
+                list_diceroll_3 = diceroll_to_db.return_dices_as_list()
+                db.session.add(diceroll_to_db)
                 db.session.commit()
-                session['dicerollid3'] = dicerolldb.id
-                id = session['dicerollid3']
+                session['diceroll_3_id'] = diceroll_to_db.id
             turn +=1
             flash('All dices thrown')
-            return render_template('throw.html', title='Throw', form=form, turn=turn, dices1=diceroll1,dices2=diceroll2, dices3=diceroll3)
-        elif form.keep.data or form.catsel.data:
+            return render_template('throw.html', title='Throw', form=form, turn=turn, dices_1=list_diceroll_1, dices_2=list_diceroll_2, dices_3=list_diceroll_3)
+        elif form.keep.data or form.cat_sel.data:
             return redirect(url_for('category',gameid=gameid)) # todo complete
-    return render_template('throw.html', title='Throw', form=form, turn=turn, dices1=diceroll1, dices2=diceroll2, dices3=diceroll3)
-
-
-@app.route('/thrown<int:gameid>/<int:turn>/<int:dicerollid>', methods=['GET', 'POST'])
-def thrown(gameid, turn, dicerollid):
-    form = ThrowForm()
-    if form.validate_on_submit():
-        if dicerollid is not None:
-            return render_template('thrown.html', title='Throw', dicerollid=dicerollid)
-    return render_template('thrown.html', title='Thrown', dicerollid='aaa')
+    return render_template('throw.html', title='Throw', form=form, turn=turn)
 
 
 if __name__ == '__main__':
