@@ -2,9 +2,9 @@
 
 {% block content %}
     <h1>Oto kości! Zagraj {{ current_user.username }}!</h1>
-    {% for gameresult in game_results %}
-    <div><p>{{ gameresult.user.username }} scored {{ gameresult.result }}</p></div>
-    {% endfor %}
+{#    {% for gameresult in game_results %}#}
+{#    <div><p>{{ gameresult.user.username }} scored {{ gameresult.result }}</p></div>#}
+{#    {% endfor %}#}
         <p>New Game? <a href="{{ url_for('newgame') }}"> Click to Play!</a></p>
 
 {% endblock %}

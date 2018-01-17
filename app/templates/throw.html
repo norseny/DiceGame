@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 
 {%  block content %}
-    <h1>Throw the dices</h1>
+    {% if turn < 4 %}
+        <h1>Throw the dices</h1>
+    {% elif turn == 4 %}
+        <h1>All of them</h1>
+    {% endif %}
     <form action="" method="post">
         {{ form.hidden_tag() }}
         {% if turn > 1 %}
@@ -13,7 +17,7 @@
                 {% endfor %}
             </p>
         {% endif %}
-        {% if turn == 2 %}
+        {% if turn > 2 %}
             <h3>Diceroll 2:</h3>
             <p>
                 {% for dice in dices2 %}
@@ -21,7 +25,7 @@
                 {% endfor %}
             </p>
         {% endif %}
-        {% if turn == 3 %}
+        {% if turn > 3 %}
             <h3>Diceroll 3:</h3>
             <p>
                 {% for dice in dices3 %}
@@ -29,7 +33,7 @@
                 {% endfor %}
             </p>
         {% endif %}
-        {% if turn != 1 %}
+        {% if turn != 1 and turn < 4%}
             <p>
                 Select the dices you want to throw again:
             </p>
@@ -47,8 +51,13 @@
                 {{ form.keep() }}
             </p>
         {% endif %}
+        {% if turn < 4%}
         <p>
             {{ form.throwall() }}
         </p>
+        {% endif %}
+        {% if turn == 4 %}
+            {{ form.catsel() }}
+        {% endif %}
     </form>
 {% endblock %}
