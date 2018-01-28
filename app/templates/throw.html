@@ -4,45 +4,45 @@
     {% if turn < 4 %}
         <h1>Throw the dices</h1>
     {% elif turn == 4 %}
-        <h1>All of them</h1>
+        <h1>All the dices</h1>
     {% endif %}
     <form action="" method="post">
         {{ form.hidden_tag() }}
         {% if turn > 1 %}
             <h2>Thrown dices:</h2>
             <h3>Diceroll 1:</h3>
-            <p>
+            <p class="dice-result">
                 {% for dice in dices_1 %}
-                    Dice{{loop.index}}:{{ dice }}
+                     <span class="dice">Dice {{loop.index}}:</span> <span class="dice-number-result">{{ dice }}</span>
                 {% endfor %}
             </p>
         {% endif %}
         {% if turn > 2 %}
             <h3>Diceroll 2:</h3>
-            <p>
+            <p class="dice-result">
                 {% for dice in dices_2 %}
-                    Dice{{loop.index}}:{{ dice }}
+                    <span class="dice">Dice {{loop.index}}:</span> <span class="dice-number-result">{{ dice }}</span>
                 {% endfor %}
             </p>
         {% endif %}
         {% if turn > 3 %}
             <h3>Diceroll 3:</h3>
-            <p>
+            <p class="dice-result">
                 {% for dice in dices_3 %}
-                    Dice{{loop.index}}:{{ dice }}
+                     <span class="dice">Dice {{loop.index}}:</span> <span class="dice-number-result">{{ dice }}</span>
                 {% endfor %}
             </p>
         {% endif %}
         {% if turn != 1 and turn < 4%}
-            <p>
+            <p class="select-dice">
                 Select the dices you want to throw again:
             </p>
             <p>
-                {{ form.dice1.description }}{{ form.dice1 }}
-                {{ form.dice2.description }}{{ form.dice2 }}
-                {{ form.dice3.description }}{{ form.dice3 }}
-                {{ form.dice4.description }}{{ form.dice4 }}
-                {{ form.dice5.description }}{{ form.dice5 }}
+                <span class="dice-choose">{{ form.dice1.description }}{{ form.dice1 }}</span>
+                <span class="dice-choose">{{ form.dice2.description }}{{ form.dice2 }}</span>
+                <span class="dice-choose">{{ form.dice3.description }}{{ form.dice3 }}</span>
+                <span class="dice-choose">{{ form.dice4.description }}{{ form.dice4 }}</span>
+                <span class="dice-choose">{{ form.dice5.description }}{{ form.dice5 }}</span>
             </p>
             <p>
                 {{ form.throw_sel() }}

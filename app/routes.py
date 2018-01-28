@@ -12,8 +12,8 @@ app.register_blueprint(throw_blueprint)
 @app.route('/index')
 @login_required  # user needs to be logged to access "/" and "/index"
 def index():
-    # return render_template('index.html', title='Home')
-    return render_template('form.html')
+    return render_template('index.html', title='Home')
+    # return render_template('form.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -56,6 +56,7 @@ def register():
 
 @app.route('/newgame', methods=['GET', 'POST'])
 def newgame():
+    print('vvv')
 
     form = NewGameForm()
     if form.validate_on_submit():
@@ -75,23 +76,11 @@ def newgame():
             db.session.add(game_result)
             db.session.commit()
 
-        flash('New game {} and {} computer players created'.format(game.name, computer_players_no))
+        flash('New game "{}" and {} computer players created'.format(game.name, computer_players_no))
 
         return redirect(url_for('playersnames', gameid=game.id, hplayers_no=human_players_no))
     return render_template('newgame.html', title='New Game', form=form)
 
-
-@app.route('/process', methods=['POST'])
-def process():
-
-    email = request.form['email']
-    name = request.form['name']
-
-    if email and name:
-        success = 'successful'
-
-        return jsonify({'name' : success})
-    return jsonify({'error' : 'Missing data!'})
 
 @app.route('/playersnames/<int:gameid>/<int:hplayers_no>', methods=['GET', 'POST'])
 def playersnames(gameid, hplayers_no):
@@ -133,6 +122,28 @@ def playersnames(gameid, hplayers_no):
             return redirect(url_for('throw_blueprint.throw', gameid=gameid))
 
     return render_template('playersnames.html', title='Players Names', form=form, hplayers_no=hplayers_no)
+
+
+@app.route('/process', methods=['POST'])
+def process():
+    print('aaa')
+
+    human_players = request.form['human_players']
+    print('bbb')
+    print("{}".format(human_players))
+
+    if human_players:
+        success = str(human_players)
+
+        return jsonify({'name' : success})
+    return jsonify({'error' : 'Missing data!'})
+
+@app.route('/_add_numbers')
+def add_numbers():
+    a = request.args.get('a', 0, type=int)
+    b = request.args.get('b', 0, type=int)
+    return jsonify(result=a + b)
+
 
 if __name__ == '__main__':
     app.run(host='localhost', port=5027, debug=True)

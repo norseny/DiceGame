@@ -61,7 +61,3 @@ class ThrowForm(FlaskForm):
     throw_all = SubmitField('Throw all 5 dices')
     keep = SubmitField('Keep all the dices and select the category')
     cat_sel = SubmitField('Go to category selection')
-
-
-
-

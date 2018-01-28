@@ -2,8 +2,7 @@ $(document).ready(function() {
 	$('form').on('submit', function(event) {
 		$.ajax({
 			data : {
-				name : $('#nameInput').val(),
-				email : $('#emailInput').val()
+				human_players : $('#human_playersInput').val()
 			},
 			type : 'POST',
 			url : '/process'
