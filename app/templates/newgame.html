@@ -11,6 +11,18 @@
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
+            {{ form.human_players.label }}
+            {{ form.human_players(size=2)}}
+            {% for error in form.human_players.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+            {{ form.computer_players.label }}
+            {{ form.computer_players(size=2)}}
+            {% for error in form.computer_players.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
         <p>
             {{ form.submit() }}
         </p>

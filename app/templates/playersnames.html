@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{%  block content %}
+    <h1>Players Names</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.player_name1.label }}
+            {{ form.player_name1() }}
+            {% for error in form.player_name1.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.player_name2.label }}
+            {{ form.player_name2() }}
+            {% for error in form.player_name2.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        {% if hplayers_no > 2 %}
+            <p>
+                {{ form.player_name3.label }}
+                {{ form.player_name3() }}
+                {% for error in form.player_name3.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+                <p>
+                {{ form.player_name4.label }}
+                {{ form.player_name4() }}
+                {% for error in form.player_name4.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.player_name5.label }}
+                {{ form.player_name5() }}
+                {% for error in form.player_name5.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+        {% endif %}
+        <p>
+            {{ form.throw() }}
+        </p>
+    </form>
+{% endblock %}

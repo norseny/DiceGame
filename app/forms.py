@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import DataRequired, ValidationError, EqualTo
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FormField, FieldList
+from wtforms.validators import DataRequired, ValidationError, EqualTo, NumberRange
 from app.models import *
 
 
@@ -25,6 +25,8 @@ class RegistrationForm(FlaskForm):
 
 class NewGameForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
+    human_players = IntegerField('Human Players', validators=[DataRequired(), NumberRange(min=0, max=10)])
+    computer_players = IntegerField('Computer Players') #TODO: mozna zostawic puste, ale jesli wypelnione, nie moze przekraczac 10
     submit = SubmitField('Start')
 
     def validate_name(self, name):
@@ -32,6 +34,21 @@ class NewGameForm(FlaskForm):
         if game is not None:
             raise ValidationError('Please use different name.')
 
+# class PlayerNameForm(FlaskForm):
+#     player_name = StringField('Name', validators=[DataRequired()])
+#
+#
+# class PlayersNamesForm(FlaskForm):
+#     players_names = FieldList(FormField(PlayerNameForm), min_entries=1)
+#     throw = SubmitField('Let the first player throw!')
+
+class PlayersNamesForm(FlaskForm):
+    player_name1 = StringField('Name 1', validators=[DataRequired()])
+    player_name2 = StringField('Name 2')
+    player_name3 = StringField('Name 3')
+    player_name4 = StringField('Name 4')
+    player_name5 = StringField('Name 5')
+    throw = SubmitField('Let the first player throw!')
 
 class ThrowForm(FlaskForm):
     dice1 = BooleanField('Dice 1',description='Dice 1:') # todo ,default=False) = nie działa, zrobić domyslnie niezaznaczone w kazdej turze

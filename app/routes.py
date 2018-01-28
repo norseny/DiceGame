@@ -1,21 +1,19 @@
-from flask import render_template, flash, redirect, url_for, request, session
+from flask import render_template, flash, redirect, url_for, request, session, jsonify
 from app import app, db
 from app.forms import *
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import *
 from werkzeug.urls import url_parse
-import random
+from .throw import throw_blueprint
 
+app.register_blueprint(throw_blueprint)
 
 @app.route('/')
 @app.route('/index')
 @login_required  # user needs to be logged to access "/" and "/index"
 def index():
-    # return render_template('index.html', title='Home', game_results=Gameresult.query.all())
-    return render_template('index.html', title='Home', game_results=current_user.game_results)
-    # return render_template('index.html', title='Home', game_results=game_results)
-# w tutorialu posts=posts
-
+    # return render_template('index.html', title='Home')
+    return render_template('form.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -51,101 +49,90 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations, you are now a registered user-player')
+        flash('Congratulations, you are now a registered user')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
 
 @app.route('/newgame', methods=['GET', 'POST'])
 def newgame():
+
     form = NewGameForm()
     if form.validate_on_submit():
+
         game = Game(name=form.name.data)
         db.session.add(game)
-        game_result = Gameresult(game_id=game.id, user_id=current_user.id)
-        db.session.add(game)
+        db.session.commit()
+        human_players_no = form.human_players.data
+
+        computer_players_no = form.computer_players.data
+
+        for c_player in range(1,computer_players_no):
+            player = Player(player_name='C'+str(c_player))
+            db.session.add(player)
+            db.session.commit()
+            game_result = Gameresult(game_id=game.id, player_id=player.id)
+            db.session.add(game_result)
+            db.session.commit()
+
+        flash('New game {} and {} computer players created'.format(game.name, computer_players_no))
+
+        return redirect(url_for('playersnames', gameid=game.id, hplayers_no=human_players_no))
+    return render_template('newgame.html', title='New Game', form=form)
+
+
+@app.route('/process', methods=['POST'])
+def process():
+
+    email = request.form['email']
+    name = request.form['name']
+
+    if email and name:
+        success = 'successful'
+
+        return jsonify({'name' : success})
+    return jsonify({'error' : 'Missing data!'})
+
+@app.route('/playersnames/<int:gameid>/<int:hplayers_no>', methods=['GET', 'POST'])
+def playersnames(gameid, hplayers_no):
+
+    form = PlayersNamesForm()
+    if form.validate_on_submit():
+
+        player = Player(player_name=form.player_name1.data)
+        db.session.add(player)
+        db.session.commit()
+        game_result = Gameresult(game_id=gameid, player_id=player.id)
         db.session.add(game_result)
         db.session.commit()
+
+        player = Player(player_name=form.player_name2.data)
+        db.session.add(player)
+        db.session.commit()
+        game_result = Gameresult(game_id=gameid, player_id=player.id)
+        db.session.add(game_result)
+        db.session.commit()
+
+        # player = Player(player_name=form.player_name3.data)
+        # db.session.add(player)
+        # db.session.commit()
+        # game_result = Gameresult(game_id=gameid, player_id=player.id)
+        # db.session.add(game_result)
+        # db.session.commit()
+
+        flash('{} human players created'.format(hplayers_no))
+
         if session.get('diceroll_1_id'): # moze da sie inaczej?
             session.pop('diceroll_1_id')
         if session.get('diceroll_2_id'):
             session.pop('diceroll_2_id')
         if session.get('diceroll_3_id'):
             session.pop('diceroll_3_id')
-        flash('New game %s created' % game.name)
-        return redirect(url_for('throw', gameid=game.id))
-    return render_template('newgame.html', title='New Game', form=form)
 
+        for p in range (1, hplayers_no):
+            return redirect(url_for('throw_blueprint.throw', gameid=gameid))
 
-@app.route('/throw/<int:gameid>', methods=['GET', 'POST'])
-def throw(gameid):      # podzielic funkcję na 3 czesci w zaleznosci od wybranego submita???
-    turn = 1
-    list_diceroll_1, list_diceroll_2, list_diceroll_3 = [], [], []
-    if session.get('diceroll_1_id'):
-        class_diceroll_1 = Diceroll.query.get(session['diceroll_1_id'])
-        list_diceroll_1 = class_diceroll_1.return_dices_as_list()
-        turn = 2
-        if session.get('diceroll_2_id'):
-            class_diceroll_2 = Diceroll.query.get(session['diceroll_2_id'])
-            list_diceroll_2 = class_diceroll_2.return_dices_as_list()
-            turn = 3
-    form = ThrowForm()
-    if form.validate_on_submit():
-        if form.throw_sel.data:
-            if turn > 1:
-                diceroll_to_db = Diceroll()
-                if turn == 2:
-                    diceroll_to_db = class_diceroll_1
-                elif turn == 3:
-                    diceroll_to_db = class_diceroll_2
-                if form.dice1.data:
-                    diceroll_to_db.dice1 = random.randint(1, 6)
-                if form.dice2.data:
-                    diceroll_to_db.dice2 = random.randint(1, 6)
-                if form.dice3.data:
-                    diceroll_to_db.dice3 = random.randint(1, 6)
-                if form.dice4.data:
-                    diceroll_to_db.dice5 = random.randint(1, 6)
-                if form.dice5.data:
-                    diceroll_to_db.dice5 = random.randint(1, 6)
-                flash('Selected dices thrown')
-                db.session.add(diceroll_to_db)
-                db.session.commit()
-                if turn == 2:
-                    session['diceroll_2_id'] = diceroll_to_db.id
-                    class_diceroll_2 = Diceroll.query.get(session['diceroll_2_id'])
-                    list_diceroll_2 = class_diceroll_2.return_dices_as_list()
-                elif turn == 3:
-                    session['diceroll_3_id'] = diceroll_to_db.id
-                    class_diceroll_3 = Diceroll.query.get(session['diceroll_3_id'])
-                    list_diceroll_3 = class_diceroll_3.return_dices_as_list()
-                turn += 1
-                return render_template('throw.html', title='Throw', form=form, turn=turn, dices_1=list_diceroll_1,dices_2=list_diceroll_2, dices_3=list_diceroll_3)
-        elif form.throw_all.data:
-            diceroll_to_db = Diceroll()
-            diceroll_to_db.generate_all_rand_dices()
-            if turn == 1:
-                list_diceroll_1 = diceroll_to_db.return_dices_as_list()
-                db.session.add(diceroll_to_db)
-                db.session.commit()
-                session['diceroll_1_id'] = diceroll_to_db.id
-            elif turn == 2:
-                list_diceroll_2 = diceroll_to_db.return_dices_as_list()
-                db.session.add(diceroll_to_db)
-                db.session.commit()
-                session['diceroll_2_id'] = diceroll_to_db.id
-            elif turn == 3:
-                list_diceroll_3 = diceroll_to_db.return_dices_as_list()
-                db.session.add(diceroll_to_db)
-                db.session.commit()
-                session['diceroll_3_id'] = diceroll_to_db.id
-            turn +=1
-            flash('All dices thrown')
-            return render_template('throw.html', title='Throw', form=form, turn=turn, dices_1=list_diceroll_1, dices_2=list_diceroll_2, dices_3=list_diceroll_3)
-        elif form.keep.data or form.cat_sel.data:
-            return redirect(url_for('category',gameid=gameid)) # todo complete
-    return render_template('throw.html', title='Throw', form=form, turn=turn)
-
+    return render_template('playersnames.html', title='Players Names', form=form, hplayers_no=hplayers_no)
 
 if __name__ == '__main__':
     app.run(host='localhost', port=5027, debug=True)

@@ -9,8 +9,6 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True)
     password_hash = db.Column(db.String(128))
-    game_results = db.relationship('Gameresult', backref='user', lazy='dynamic')
-    game_round = db.relationship('Round', backref='user', lazy='dynamic')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -20,6 +18,16 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+
+class Player(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    player_name = db.Column(db.String(64))
+    game_results = db.relationship('Gameresult', backref='player', lazy='dynamic')
+    game_round = db.relationship('Round', backref='player', lazy='dynamic')
+
+    def __repr__(self):
+        return '<Player {}>'.format(self.player_name)
 
 
 class Game(db.Model):
@@ -69,7 +77,7 @@ class Diceroll(db.Model):
 
 class Round(db.Model): # 'Turn' as round is a function
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
     game_id = db.Column(db.Integer, db.ForeignKey('game.id'))
     diceroll1_id = db.Column(db.Integer, db.ForeignKey('diceroll.id'))
     diceroll2_id = db.Column(db.Integer, db.ForeignKey('diceroll.id'))
@@ -81,11 +89,11 @@ class Round(db.Model): # 'Turn' as round is a function
 class Gameresult(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     game_id = db.Column(db.Integer, db.ForeignKey('game.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
     result = db.Column(db.Integer)
 
     def __repr__(self):
-        return '<Gameresult {} {} {}>'.format(self.game_id, self.user_id, self.result)
+        return '<Gameresult {} {} {}>'.format(self.game_id, self.player_id, self.result)
 
 
 @login.user_loader
