@@ -57,14 +57,16 @@ def register():
 @app.route('/newgame', methods=['GET', 'POST'])
 def newgame():
     print('vvv')
+    print(request.form)
 
     form = NewGameForm()
     if form.validate_on_submit():
+        # print(request.POST['human_players'])
 
         game = Game(name=form.name.data)
         db.session.add(game)
         db.session.commit()
-        human_players_no = form.human_players.data
+        # human_players_no = form.human_players.data
 
         computer_players_no = form.computer_players.data
 
@@ -78,7 +80,9 @@ def newgame():
 
         flash('New game "{}" and {} computer players created'.format(game.name, computer_players_no))
 
-        return redirect(url_for('playersnames', gameid=game.id, hplayers_no=human_players_no))
+        # return redirect(url_for('playersnames', gameid=game.id, hplayers_no=human_players_no))
+        return redirect(url_for('playersnames', gameid=game.id))
+
     return render_template('newgame.html', title='New Game', form=form)
 
 

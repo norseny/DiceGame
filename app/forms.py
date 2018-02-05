@@ -25,7 +25,7 @@ class RegistrationForm(FlaskForm):
 
 class NewGameForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
-    human_players = IntegerField('Human Players', validators=[DataRequired(), NumberRange(min=0, max=10)])
+    human_players = StringField('Human Players')
     computer_players = IntegerField('Computer Players') #TODO: mozna zostawic puste, ale jesli wypelnione, nie moze przekraczac 10
     submit = SubmitField('Start')
 

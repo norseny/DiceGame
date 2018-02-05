@@ -25,7 +25,9 @@
 
         </p>
             {{ form.human_players.label }}
-            {{ form.human_players(size=2)}}
+{#            {{ form.human_players(size=2)}}#}
+            <input name="human_players[]" size="50" type="text">
+        <input name="human_players[]" size="50" type="text">
             {% for error in form.human_players.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
