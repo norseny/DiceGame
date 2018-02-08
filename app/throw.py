@@ -1,11 +1,13 @@
 from flask import render_template, flash, redirect, url_for, session, Blueprint
 from app.forms import *
-from app.models import *
+from app.models.game import *
+from app import db
 import random
 
 throw_blueprint = Blueprint('throw_blueprint', __name__)
 
-@throw_blueprint.route('/throw/<int:gameid>', methods=['GET', 'POST'])
+
+@throw_blueprint.route('/throw/<int:gameid>', methods=['GET', 'POST']) #TODO wrzuca do bazy tylko ostatniego dicerolla
 def throw(gameid):      # podzielic funkcję na 3 czesci w zaleznosci od wybranego submita???
     turn = 1
     list_diceroll_1, list_diceroll_2, list_diceroll_3 = [], [], []
@@ -48,7 +50,7 @@ def throw(gameid):      # podzielic funkcję na 3 czesci w zaleznosci od wybrane
                     class_diceroll_3 = Diceroll.query.get(session['diceroll_3_id'])
                     list_diceroll_3 = class_diceroll_3.return_dices_as_list()
                 turn += 1
-                return render_template('throw.html', title='Throw', form=form, turn=turn, dices_1=list_diceroll_1,dices_2=list_diceroll_2, dices_3=list_diceroll_3)
+                return render_template('throw.html', title='Throw', form=form, turn=turn, dices_1=list_diceroll_1, dices_2=list_diceroll_2, dices_3=list_diceroll_3)
         elif form.throw_all.data:
             diceroll_to_db = Diceroll()
             diceroll_to_db.generate_all_rand_dices()
@@ -67,9 +69,9 @@ def throw(gameid):      # podzielic funkcję na 3 czesci w zaleznosci od wybrane
                 db.session.add(diceroll_to_db)
                 db.session.commit()
                 session['diceroll_3_id'] = diceroll_to_db.id
-            turn +=1
+            turn += 1
             flash('All dices thrown')
             return render_template('throw.html', title='Throw', form=form, turn=turn, dices_1=list_diceroll_1, dices_2=list_diceroll_2, dices_3=list_diceroll_3)
         elif form.keep.data or form.cat_sel.data:
-            return redirect(url_for('category',gameid=gameid)) # todo complete
+            return redirect(url_for('category', gameid=gameid))  # todo complete
     return render_template('throw.html', title='Throw', form=form, turn=turn)

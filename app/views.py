@@ -1,19 +1,21 @@
 from flask import render_template, flash, redirect, url_for, request, session, jsonify
-from app import app, db
-from app.forms import *
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import *
 from werkzeug.urls import url_parse
-from .throw import throw_blueprint
+
+from app import app
+from app.forms import *
+from app.models.user import *
+from app.throw import throw_blueprint
 
 app.register_blueprint(throw_blueprint)
 
+
 @app.route('/')
 @app.route('/index')
-@login_required  # user needs to be logged to access "/" and "/index"
+@login_required
 def index():
     return render_template('index.html', title='Home')
-    # return render_template('form.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -56,38 +58,21 @@ def register():
 
 @app.route('/newgame', methods=['GET', 'POST'])
 def newgame():
-    print('vvv')
-    print(request.form)
-
     form = NewGameForm()
     if form.validate_on_submit():
-        # print(request.POST['human_players'])
 
-        game = Game(name=form.name.data)
-        db.session.add(game)
-        db.session.commit()
-        # human_players_no = form.human_players.data
+        game = Game(name=form.name.data, cp_no=form.computer_players.data)
+        session['hplayers'] = form.human_players.data
 
-        computer_players_no = form.computer_players.data
+        flash('New game "{}" and {} computer players created'.format(game.name, form.computer_players.data))
 
-        for c_player in range(1,computer_players_no):
-            player = Player(player_name='C'+str(c_player))
-            db.session.add(player)
-            db.session.commit()
-            game_result = Gameresult(game_id=game.id, player_id=player.id)
-            db.session.add(game_result)
-            db.session.commit()
-
-        flash('New game "{}" and {} computer players created'.format(game.name, computer_players_no))
-
-        # return redirect(url_for('playersnames', gameid=game.id, hplayers_no=human_players_no))
         return redirect(url_for('playersnames', gameid=game.id))
-
     return render_template('newgame.html', title='New Game', form=form)
 
 
-@app.route('/playersnames/<int:gameid>/<int:hplayers_no>', methods=['GET', 'POST'])
-def playersnames(gameid, hplayers_no):
+@app.route('/playersnames/<int:gameid>', methods=['GET', 'POST'])
+def playersnames(gameid):
+    hplayers_no = 0
 
     form = PlayersNamesForm()
     if form.validate_on_submit():
@@ -106,48 +91,36 @@ def playersnames(gameid, hplayers_no):
         db.session.add(game_result)
         db.session.commit()
 
-        # player = Player(player_name=form.player_name3.data)
-        # db.session.add(player)
-        # db.session.commit()
-        # game_result = Gameresult(game_id=gameid, player_id=player.id)
-        # db.session.add(game_result)
-        # db.session.commit()
+        if session.get('hplayers'):
+            hplayers_no = session['hplayers']
 
-        flash('{} human players created'.format(hplayers_no))
+        flash('{} human players: {} and {} created'.format(gameid, form.player_name1.data, form.player_name2.data))
 
-        if session.get('diceroll_1_id'): # moze da sie inaczej?
+        if session.get('diceroll_1_id'):  # moze da sie inaczej?
             session.pop('diceroll_1_id')
         if session.get('diceroll_2_id'):
             session.pop('diceroll_2_id')
         if session.get('diceroll_3_id'):
             session.pop('diceroll_3_id')
 
-        for p in range (1, hplayers_no):
-            return redirect(url_for('throw_blueprint.throw', gameid=gameid))
-
+        return redirect(url_for('throw_blueprint.throw', gameid=gameid))
     return render_template('playersnames.html', title='Players Names', form=form, hplayers_no=hplayers_no)
 
 
 @app.route('/process', methods=['POST'])
 def process():
-    print('aaa')
 
     human_players = request.form['human_players']
-    print('bbb')
-    print("{}".format(human_players))
 
     if human_players:
         success = str(human_players)
 
-        return jsonify({'name' : success})
-    return jsonify({'error' : 'Missing data!'})
+        return jsonify({'name': success})
+    return jsonify({'error': 'Missing data!'})
+
 
 @app.route('/_add_numbers')
 def add_numbers():
     a = request.args.get('a', 0, type=int)
     b = request.args.get('b', 0, type=int)
     return jsonify(result=a + b)
-
-
-if __name__ == '__main__':
-    app.run(host='localhost', port=5027, debug=True)

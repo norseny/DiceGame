@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FormField, FieldList
 from wtforms.validators import DataRequired, ValidationError, EqualTo, NumberRange
-from app.models import *
+from app.models.game import *
+from app.models.user import *
 
 
 class LoginForm(FlaskForm):
@@ -25,7 +26,7 @@ class RegistrationForm(FlaskForm):
 
 class NewGameForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
-    human_players = StringField('Human Players')
+    human_players = IntegerField('Human Players')
     computer_players = IntegerField('Computer Players') #TODO: mozna zostawic puste, ale jesli wypelnione, nie moze przekraczac 10
     submit = SubmitField('Start')
 

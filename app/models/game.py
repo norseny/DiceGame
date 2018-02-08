@@ -1,30 +1,12 @@
 from app import db
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
-from app import login
 import random
-
-
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True)
-    password_hash = db.Column(db.String(128))
-
-    def __repr__(self):
-        return '<User {}>'.format(self.username)
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
 
 
 class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     player_name = db.Column(db.String(64))
     game_results = db.relationship('Gameresult', backref='player', lazy='dynamic')
-    game_round = db.relationship('Round', backref='player', lazy='dynamic')
+    game_turn = db.relationship('Turn', backref='player', lazy='dynamic')
 
     def __repr__(self):
         return '<Player {}>'.format(self.player_name)
@@ -34,10 +16,27 @@ class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
     game_results = db.relationship('Gameresult', backref='game', lazy='dynamic')
-    game_round = db.relationship('Round', backref='game', lazy='dynamic')
+    game_round = db.relationship('Turn', backref='game', lazy='dynamic')
+
+    def __init__(self, name, cp_no=0):
+        self.name = name
+        insert_to_db(self)
+        self.create_cplayers(cp_no)
 
     def __repr__(self):
         return '<Game {}>'.format(self.name)
+
+    def create_cplayers(self, cp_no):
+        for comp in range(1, int(cp_no)+1):
+            player = Player(player_name='Computer Player '+str(comp))
+            existing_player = Player.query.filter_by(player_name=player.player_name).first()
+            if existing_player is None:
+                insert_to_db(player)
+                id_to_db = player.id
+            else:
+                id_to_db = existing_player.id
+            game_result = Gameresult(game_id=self.id, player_id=id_to_db)
+            insert_to_db(game_result)
 
 
 class Diceroll(db.Model):
@@ -47,9 +46,9 @@ class Diceroll(db.Model):
     dice3 = db.Column(db.Integer)
     dice4 = db.Column(db.Integer)
     dice5 = db.Column(db.Integer)
-    diceroll1 = db.relationship('Round',backref='diceroll1', lazy='dynamic', foreign_keys = 'Round.diceroll1_id')
-    diceroll2 = db.relationship('Round',backref='diceroll2', lazy='dynamic', foreign_keys = 'Round.diceroll2_id')
-    diceroll3 = db.relationship('Round',backref='diceroll3', lazy='dynamic', foreign_keys = 'Round.diceroll3_id')
+    diceroll1 = db.relationship('Turn', backref='diceroll1', lazy='dynamic', foreign_keys='Turn.diceroll1_id')
+    diceroll2 = db.relationship('Turn', backref='diceroll2', lazy='dynamic', foreign_keys='Turn.diceroll2_id')
+    diceroll3 = db.relationship('Turn', backref='diceroll3', lazy='dynamic', foreign_keys='Turn.diceroll3_id')
 
     def return_dices_as_list(self):
         dices_list = []
@@ -75,7 +74,7 @@ class Diceroll(db.Model):
         self.turn_dices_list_to_class_attributes(dices_list)
 
 
-class Round(db.Model): # 'Turn' as round is a function
+class Turn(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
     game_id = db.Column(db.Integer, db.ForeignKey('game.id'))
@@ -96,6 +95,6 @@ class Gameresult(db.Model):
         return '<Gameresult {} {} {}>'.format(self.game_id, self.player_id, self.result)
 
 
-@login.user_loader
-def load_user(id):
-    return User.query.get(int(id))
+def insert_to_db(self):
+    db.session.add(self)
+    db.session.commit()
