@@ -38,6 +38,7 @@ def login():
 @app.route('/logout')
 def logout():
     logout_user()
+    session.clear()
     return redirect(url_for('index'))
 
 
@@ -94,7 +95,7 @@ def playersnames(gameid):
         if session.get('hplayers'):
             hplayers_no = session['hplayers']
 
-        flash('{} human players: {} and {} created'.format(gameid, form.player_name1.data, form.player_name2.data))
+        flash('Human players: {} and {} created'.format(form.player_name1.data, form.player_name2.data))
 
         if session.get('diceroll_1_id'):  # moze da sie inaczej?
             session.pop('diceroll_1_id')
