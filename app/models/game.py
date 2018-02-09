@@ -1,9 +1,10 @@
 from app import db
-
+from flask import session
 
 class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     player_name = db.Column(db.String(64))
+    computer_player = db.Column(db.Boolean)
     game_results = db.relationship('Gameresult', backref='player', lazy='dynamic')
     game_turn = db.relationship('Turn', backref='player', lazy='dynamic')
 
@@ -27,7 +28,7 @@ class Game(db.Model):
 
     def create_cplayers(self, cp_no):
         for comp in range(1, int(cp_no)+1):
-            player = Player(player_name='Computer Player '+str(comp))
+            player = Player(player_name='Computer Player '+str(comp), computer_player=True)
             existing_player = Player.query.filter_by(player_name=player.player_name).first()
             if existing_player is None:
                 insert_to_db(player)
@@ -36,6 +37,16 @@ class Game(db.Model):
                 id_to_db = existing_player.id
             game_result = Gameresult(game_id=self.id, player_id=id_to_db)
             insert_to_db(game_result)
+
+    def get_list_of_human_players_ids(self):
+        game_player_relation = Gameresult.query.filter_by(game_id=self.id).all()
+        players_ids_all = [a.player_id for a in game_player_relation]
+        players_ids_humans = []
+        for x in players_ids_all: # TODO zamienic na list comprehension
+            player = Player.query.get(int(x))
+            if not player.computer_player:
+                players_ids_humans.append(player.id)
+        return players_ids_humans
 
 
 class Turn(db.Model):

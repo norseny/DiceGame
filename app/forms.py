@@ -62,3 +62,23 @@ class ThrowForm(FlaskForm):
     throw_all = SubmitField('Throw all 5 dices')
     keep = SubmitField('Keep all the dices and select the category')
     cat_sel = SubmitField('Go to category selection')
+
+
+class SelectCategoryForm(FlaskForm):
+    aces = BooleanField('Aces')
+    twos = BooleanField('Twos')
+    threes = BooleanField('Threes')
+    fours = BooleanField('Fours')
+    fives = BooleanField('Fives')
+    sixes = BooleanField('Sixes')
+    three_of_a_kind = BooleanField('Three of a kind')
+    four_of_a_kind = BooleanField('Four Of A Kind')
+    full_house = BooleanField('Full house')
+    small_straight = BooleanField('Small straight')
+    large_straight = BooleanField('Large straight')
+    yahtzee = BooleanField('Yahtzee')
+    chance = BooleanField('Chance')
+
+    submit_the_box = SubmitField('Submit the category')
+    submit_next_player = SubmitField('Go to another player')
+

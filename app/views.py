@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request, session, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
-
+from app.models.category import *
 from app import app
 from app.forms import *
 from app.models.user import *
@@ -64,6 +64,7 @@ def newgame():
 
         game = Game(name=form.name.data, cp_no=form.computer_players.data)
         session['hplayers'] = form.human_players.data
+        # session['player_no'] = 0
 
         flash('New game "{}" and {} computer players created'.format(game.name, form.computer_players.data))
 
@@ -104,8 +105,38 @@ def playersnames(gameid):
         if session.get('diceroll_3_id'):
             session.pop('diceroll_3_id')
 
-        return redirect(url_for('throw_blueprint.throw', gameid=gameid))
+        session['game_turn'] = 1 # todo może niepotrzebne
+        game = Game.query.get(gameid)
+        hplayers_ids = game.get_list_of_human_players_ids()
+        curr_player_id = hplayers_ids[0]
+
+        return redirect(url_for('throw_blueprint.throw', gameid=gameid,playerid=curr_player_id))
     return render_template('playersnames.html', title='Players Names', form=form, hplayers_no=hplayers_no)
+
+
+@app.route('/category/<int:gameid>/<int:playerid>', methods=['GET','POST'])
+def category(gameid, playerid):
+
+    form = SelectCategoryForm()
+    if form.validate_on_submit():
+
+        if form.submit_the_box.data:
+            if session.get('diceroll_1_id') and session.get('diceroll_2_id') and session.get('diceroll_3_id'): # todo jak sie od razu po pierwszym lub drugim rzucie chce wybrac kategorie, to nei zadziala
+                category = Category()
+                a = form.__dict__
+                for key in a.items(): #key to tuple
+                    if key.data in category.names:
+                        if key.data:
+                            b = 2
+                b=6
+                            # category.count_result(key, value, session['diceroll_3_id'])
+
+            return render_template('category.html', title='Category Selection', form=form)
+        if form.submit_next_player.data:
+
+            return redirect(url_for('throw_blueprint.throw', gameid=gameid, playerid=playerid))
+
+    return render_template('category.html', title='Category Selection', form=form)
 
 
 @app.route('/process', methods=['POST'])

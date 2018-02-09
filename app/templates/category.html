@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{%  block content %}
+    <h1>{{ title }}</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+
+        <p>
+            [playername], your last diceroll is:
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <td>Tick the box</td>
+                    <td>Name</td>
+                    <td>How counted</td>
+                    <td>Your result</td>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>Sum</td>
+                </tr>
+            </tfoot>
+            <tbody>
+                <tr>
+                    <td>{{ form.aces }}</td>
+                    <td>Name</td>
+                    <td>How counted</td>
+                    <td>Your result</td>
+                </tr>
+                <tr>
+                    <td>{{ form.twos }}</td>
+                    <td>Name</td>
+                    <td>How counted</td>
+                    <td>Your result</td>
+                </tr>
+                <tr>
+                    <td>{{ form.threes }}</td>
+                    <td>Name</td>
+                    <td>How counted</td>
+                    <td>Your result</td>
+                </tr>
+                <tr>
+                    <td>{{ form.fours }}</td>
+                    <td>Name</td>
+                    <td>How counted</td>
+                    <td>Your result</td>
+                </tr>
+                            <tr>
+                    <td>{{ form.fives }}</td>
+                    <td>Name</td>
+                    <td>How counted</td>
+                    <td>Your result</td>
+                </tr>
+                <tr>
+                    <td>{{ form.sixes }}</td>
+                    <td>Name</td>
+                    <td>How counted</td>
+                    <td>Your result</td>
+                </tr>
+                <tr>
+                    <td>{{ form.three_of_a_kind }}</td>
+                    <td>Name</td>
+                    <td>How counted</td>
+                    <td>Your result</td>
+                </tr>
+                <tr>
+                    <td>{{ form.four_of_a_kind }}</td>
+                    <td>Name</td>
+                    <td>How counted</td>
+                    <td>Your result</td>
+                </tr>
+                            <tr>
+                    <td>{{ form.full_house }}</td>
+                    <td>Name</td>
+                    <td>How counted</td>
+                    <td>Your result</td>
+                </tr>
+                <tr>
+                    <td>{{ form.small_straight }}</td>
+                    <td>Name</td>
+                    <td>How counted</td>
+                    <td>Your result</td>
+                </tr>
+                <tr>
+                    <td>{{ form.large_straight }}</td>
+                    <td>Name</td>
+                    <td>How counted</td>
+                    <td>Your result</td>
+                </tr>
+                <tr>
+                    <td>{{ form.yahtzee }}</td>
+                    <td>Name</td>
+                    <td>How counted</td>
+                    <td>Your result</td>
+                </tr>
+                <tr>
+                    <td>{{ form.chance }}</td>
+                    <td>Name</td>
+                    <td>How counted</td>
+                    <td>Your result</td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <p>
+            {{ form.submit_the_box() }}
+        </p>
+        <p>
+            {{ form.submit_next_player() }}
+
+        </p>
+
+    </form>
+
+{% endblock %}
