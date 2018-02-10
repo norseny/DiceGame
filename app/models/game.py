@@ -22,7 +22,10 @@ class Player(db.Model):
             part_result = cat_result
         )
         insert_to_db(turn)
+        return turn.id
 
+    def generate_dict_of_part_results(self, gameid):
+        return dict(Turn.query.with_entities(Turn.category, Turn.part_result).filter_by(game_id=gameid, player_id=self.id).all())
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)

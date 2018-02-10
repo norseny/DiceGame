@@ -50,11 +50,11 @@ class Category:
             self.result = 25
 
     def small_straight_count(self, diceroll):
-        if list(range(1, 5)) or list(range(2, 6)) or list(range(3, 7)) in diceroll:
+        if self.is_sublist(list(range(1, 5)), diceroll) or self.is_sublist(list(range(2, 6)), diceroll) or self.is_sublist(list(range(3, 7)), diceroll):
             self.result = 30
 
     def large_straight_count(self, diceroll):
-        if list(range(1, 6)) or list(range(2, 7)) in diceroll:
+        if self.is_sublist(list(range(1, 6)), diceroll) or self.is_sublist(list(range(2, 7)), diceroll):
             self.result = 40
 
     def yahtzee_count(self, diceroll):
@@ -68,3 +68,9 @@ class Category:
         for thrown_number in diceroll:
             if thrown_number == number:
                 self.result += number
+
+    def is_sublist(self, lst1, lst2):
+        ls1 = [element for element in lst1 if element in lst1]
+        ls2 = [element for element in lst2 if element in lst1]
+        if ls2 == ls1:
+            return True

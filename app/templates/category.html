@@ -1,17 +1,25 @@
 {% extends "base.html" %}
 
 {%  block content %}
+    {% if hide_checkboxes %}
+        <style>
+        .hide_me {
+            visibility: hidden
+        }
+        </style>
+    {% endif %}
+
     <h1>{{ title }}</h1>
     <form action="" method="post">
         {{ form.hidden_tag() }}
 
         <p>
-            [playername], your last diceroll is:
+            {{ player_name }}, your last diceroll is: {{ last_diceroll }}
         </p>
         <table>
             <thead>
                 <tr>
-                    <td>Tick the box</td> # todo: wygląd tabeli
+                    <td class="hide_me">Tick the box</td> {# todo: wygląd tabeli, optymalizacja #}
                     <td>Name</td>
                     <td>How counted</td>
                     <td>Your result</td>
@@ -27,94 +35,147 @@
             </tfoot>
             <tbody>
                 <tr>
-                    <td>{{ form.aces }}</td>
+                    {% if cat_results['aces'] %}
+                        <td></td>
+                    {% else %}
+                        <td class="hide_me">{{ form.aces }}</td>
+                    {% endif %}
                     <td>{{ form.aces.label }}</td>
                     <td>How counted</td>
-                    <td>Your result</td>
+                    <td>{{ cat_results['aces'] }}</td>
                 </tr>
                 <tr>
-                    <td>{{ form.twos }}</td>
+                    {% if cat_results['twos'] %}
+                        <td></td>
+                    {% else %}
+                        <td class="hide_me">{{ form.twos }}</td>
+                    {% endif %}
                     <td>{{ form.twos.label }}</td>
                     <td>How counted</td>
-                    <td>Your result</td>
+                    <td>{{ cat_results['twos'] }}</td>
                 </tr>
                 <tr>
-                    <td>{{ form.threes }}</td>
+                    {% if cat_results['threes'] %}
+                        <td></td>
+                    {% else %}
+                        <td class="hide_me">{{ form.threes }}</td>
+                    {% endif %}
                     <td>{{ form.threes.label }}</td>
                     <td>How counted</td>
-                    <td>Your result</td>
+                    <td>{{ cat_results['threes'] }}</td>
                 </tr>
                 <tr>
-                    <td>{{ form.fours }}</td>
+                    {% if cat_results['fours'] %}
+                        <td></td>
+                    {% else %}
+                        <td class="hide_me">{{ form.fours }}</td>
+                    {% endif %}
                     <td>{{ form.fours.label }}</td>
                     <td>How counted</td>
-                    <td>Your result</td>
+                    <td>{{ cat_results['fours'] }}</td>
                 </tr>
                 <tr>
-                    <td>{{ form.fives }}</td>
+                    {% if cat_results['fives'] %}
+                        <td></td>
+                    {% else %}
+                        <td class="hide_me">{{ form.fives }}</td>
+                    {% endif %}
                     <td>{{ form.fives.label }}</td>
                     <td>How counted</td>
-                    <td>Your result</td>
+                    <td>{{ cat_results['fives'] }}</td>
                 </tr>
                 <tr>
-                    <td>{{ form.sixes }}</td>
+                    {% if cat_results['sixes'] %}
+                        <td></td>
+                    {% else %}
+                        <td class="hide_me">{{ form.sixes }}</td>
+                    {% endif %}
                     <td>{{ form.sixes.label }}</td>
                     <td>How counted</td>
-                    <td>Your result</td>
+                    <td>{{ cat_results['sixes'] }}</td>
                 </tr>
                 <tr>
-                    <td>{{ form.three_of_a_kind }}</td>
+                    {% if cat_results['three_of_a_kind'] %}
+                        <td></td>
+                    {% else %}
+                        <td class="hide_me">{{ form.three_of_a_kind }}</td>
+                    {% endif %}
                     <td>{{ form.three_of_a_kind.label }}</td>
                     <td>How counted</td>
-                    <td>Your result</td>
+                    <td>{{ cat_results['three_of_a_kind'] }}</td>
                 </tr>
                 <tr>
-                    <td>{{ form.four_of_a_kind }}</td>
+                    {% if cat_results['four_of_a_kind'] %}
+                        <td></td>
+                    {% else %}
+                        <td class="hide_me">{{ form.four_of_a_kind }}</td>
+                    {% endif %}
                     <td>{{ form.four_of_a_kind.label }}</td>
                     <td>How counted</td>
-                    <td>Your result</td>
+                    <td>{{ cat_results['four_of_a_kind'] }}</td>
                 </tr>
                 <tr>
-                    <td>{{ form.full_house }}</td>
+                    {% if cat_results['full_house'] %}
+                        <td></td>
+                    {% else %}
+                        <td class="hide_me">{{ form.full_house }}</td>
+                    {% endif %}
                     <td>{{ form.full_house.label }}</td>
                     <td>How counted</td>
-                    <td>Your result</td>
+                    <td>{{ cat_results['full_house'] }}</td>
                 </tr>
                 <tr>
-                    <td>{{ form.small_straight }}</td>
+                    {% if cat_results['small_straight'] %}
+                        <td></td>
+                    {% else %}
+                        <td class="hide_me">{{ form.small_straight }}</td>
+                    {% endif %}
                     <td>{{ form.small_straight.label }}</td>
                     <td>How counted</td>
-                    <td>Your result</td>
+                    <td>{{ cat_results['small_straight'] }}</td>
                 </tr>
                 <tr>
-                    <td>{{ form.large_straight }}</td>
+                    {% if cat_results['large_straight'] %}
+                        <td></td>
+                    {% else %}
+                        <td class="hide_me">{{ form.large_straight }}</td>
+                    {% endif %}
                     <td>{{ form.large_straight.label }}</td>
                     <td>How counted</td>
-                    <td>Your result</td>
+                    <td>{{ cat_results['large_straight'] }}</td>
                 </tr>
                 <tr>
-                    <td>{{ form.yahtzee }}</td>
+                    {% if cat_results['yahtzee'] %}
+                        <td></td>
+                    {% else %}
+                        <td class="hide_me">{{ form.yahtzee }}</td>
+                    {% endif %}
                     <td>{{ form.yahtzee.label }}</td>
                     <td>How counted</td>
-                    <td>Your result</td>
+                    <td>{{ cat_results['yahtzee'] }}</td>
                 </tr>
                 <tr>
-                    <td>{{ form.chance }}</td>
+                    {% if cat_results['chance'] %}
+                        <td></td>
+                    {% else %}
+                        <td class="hide_me">{{ form.chance }}</td>
+                    {% endif %}
                     <td>{{ form.chance.label }}</td>
                     <td>How counted</td>
-                    <td>Your result</td>
+                    <td>{{ cat_results['chance'] }}</td>
                 </tr>
             </tbody>
         </table>
 
 
         <p>
-            {{ form.submit_the_box() }}
+            <span class="hide_me"> {{ form.submit_the_box() }} </span>
         </p>
-        <p>
-            {{ form.submit_next_player() }}
-
-        </p>
+        {% if hide_checkboxes %}
+            <p>
+                {{ form.submit_next_player() }}
+            </p>
+        {% endif %}
 
     </form>
 

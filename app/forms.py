@@ -35,13 +35,6 @@ class NewGameForm(FlaskForm):
         if game is not None:
             raise ValidationError('Please use different name.')
 
-# class PlayerNameForm(FlaskForm):
-#     player_name = StringField('Name', validators=[DataRequired()])
-#
-#
-# class PlayersNamesForm(FlaskForm):
-#     players_names = FieldList(FormField(PlayerNameForm), min_entries=1)
-#     throw = SubmitField('Let the first player throw!')
 
 class PlayersNamesForm(FlaskForm):
     player_name1 = StringField('Name 1', validators=[DataRequired()])
@@ -80,4 +73,5 @@ class SelectCategoryForm(FlaskForm):
     chance = BooleanField('Chance')
 
     submit_the_box = SubmitField('Submit the category')
-    submit_next_player = SubmitField('Go to another player')
+    submit_next_player = SubmitField('Next player')
+

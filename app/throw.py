@@ -1,9 +1,12 @@
 from flask import render_template, flash, redirect, url_for, session, Blueprint
+from app import app
 from app.forms import *
 from app.models.diceroll import *
+from app.category import category_blueprint
+
+app.register_blueprint(category_blueprint)
 
 throw_blueprint = Blueprint('throw_blueprint', __name__)
-
 
 @throw_blueprint.route('/throw/<int:gameid>/<int:playerid>', methods=['GET', 'POST'])
 def throw(gameid, playerid):
@@ -40,7 +43,7 @@ def throw(gameid, playerid):
             flash('All dices thrown')
 
         elif form.keep.data or form.cat_sel:
-            return redirect(url_for('category', gameid=gameid, playerid=playerid, show='False'))
+            return redirect(url_for('category_blueprint.category', gameid=gameid, playerid=playerid))
 
         dicerolls_lists.append(diceroll.return_dices_as_list())
         if turn == 1:
@@ -50,6 +53,6 @@ def throw(gameid, playerid):
         elif turn == 3:
             session['diceroll_3_id'] = diceroll.id
         turn += 1
-        return render_template('throw.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists)
+        return render_template('throw.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists, cat_results={})
 
     return render_template('throw.html', title='Throw', form=form, turn=turn)
