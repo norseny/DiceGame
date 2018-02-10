@@ -40,7 +40,7 @@ def throw(gameid, playerid):
             flash('All dices thrown')
 
         elif form.keep.data or form.cat_sel:
-            return redirect(url_for('category', gameid=gameid, playerid=playerid))  # todo complete
+            return redirect(url_for('category', gameid=gameid, playerid=playerid, show='False'))
 
         dicerolls_lists.append(diceroll.return_dices_as_list())
         if turn == 1:

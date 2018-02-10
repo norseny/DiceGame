@@ -11,6 +11,18 @@ class Player(db.Model):
     def __repr__(self):
         return '<Player {}>'.format(self.player_name)
 
+    def insert_part_result(self, gameid, cat_name, cat_result, diceroll_1_id, diceroll_2_id, diceroll_3_id):
+        turn = Turn(
+            player_id = self.id,
+            game_id = gameid,
+            diceroll1_id = diceroll_1_id,
+            diceroll2_id = diceroll_2_id,
+            diceroll3_id = diceroll_3_id,
+            category = cat_name,
+            part_result = cat_result
+        )
+        insert_to_db(turn)
+
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
