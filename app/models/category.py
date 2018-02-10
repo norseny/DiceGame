@@ -3,7 +3,7 @@
 class Category:
     names = ['aces',
              'twos',
-             'threes'
+             'threes',
              'fours',
              'fives',
              'sixes',

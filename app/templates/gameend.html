@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{%  block content %}
+    <h1>{{ title }}</h1>
+    <table>
+        <caption>End of the game! Here are some results:
+        </caption>
+        <thead>
+            <tr>
+                <th>Player name</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key, value in gameresults_dict.items() %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>{{ value }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p>New Game? <a href="{{ url_for('newgame') }}"> Click to Play!</a></p>
+
+{% endblock %}

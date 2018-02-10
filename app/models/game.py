@@ -1,5 +1,5 @@
 from app import db
-from flask import session
+from sqlalchemy import func
 
 class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -22,10 +22,12 @@ class Player(db.Model):
             part_result = cat_result
         )
         insert_to_db(turn)
-        return turn.id
 
     def generate_dict_of_part_results(self, gameid):
         return dict(Turn.query.with_entities(Turn.category, Turn.part_result).filter_by(game_id=gameid, player_id=self.id).all())
+
+    def get_no_of_turns(self, gameid):
+        return Turn.query.filter_by(game_id=gameid, player_id=self.id).count()
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -53,9 +55,12 @@ class Game(db.Model):
             game_result = Gameresult(game_id=self.id, player_id=id_to_db)
             insert_to_db(game_result)
 
-    def get_list_of_human_players_ids(self):
+    def get_list_of_all_players_ids(self):
         game_player_relation = Gameresult.query.filter_by(game_id=self.id).all()
-        players_ids_all = [a.player_id for a in game_player_relation]
+        return [a.player_id for a in game_player_relation]
+
+    def get_list_of_human_players_ids(self):
+        players_ids_all = self.get_list_of_all_players_ids()
         players_ids_humans = []
         for x in players_ids_all: # TODO zamienic na list comprehension
             player = Player.query.get(int(x))
@@ -84,6 +89,15 @@ class Gameresult(db.Model):
     def __repr__(self):
         return '<Gameresult {} {} {}>'.format(self.game_id, self.player_id, self.result)
 
+    def update_results(self, gameid):
+        game = Game.query.get(gameid)
+        players_ids = game.get_list_of_all_players_ids()
+        for player_id in players_ids:
+            query = Turn.query.filter_by(game_id=gameid, player_id=player_id)
+            total_for_player = query.with_entities(func.sum(Turn.part_result)).scalar()
+            gameresult = Gameresult.query.filter_by(game_id=gameid, player_id=player_id).scalar()
+            gameresult.result = total_for_player
+            db.session.commit()
 
 def insert_to_db(self):
     db.session.add(self)
