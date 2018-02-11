@@ -22,37 +22,106 @@ def throw(gameid, playerid):
             dicerolls_lists.append(diceroll_2.return_dices_as_list())
             turn = 3
 
+    game = Game.query.get(int(gameid))
+
     form = ThrowForm()
 
     if form.validate_on_submit():
+
         diceroll = Diceroll()
 
-        if form.throw_sel.data:
-            if turn > 1:
-                diceroll = Diceroll()
-                if turn == 2:
-                    diceroll.assign_dices(diceroll_1)
-                elif turn == 3:
-                    diceroll.assign_dices(diceroll_2)
-                diceroll.check_selected_get_random_numbers_and_insert(form.dice1.data, form.dice2.data, form.dice3.data, form.dice4.data, form.dice5.data)
-                flash('Selected dices thrown')
+        if playerid in game.get_list_of_human_players_ids():
 
-        elif form.throw_all.data:
-            diceroll.generate_all_rand_dices_and_insert_to_db()
+            if form.throw_sel.data:
+                if turn > 1:
+                    diceroll = Diceroll()
+                    if turn == 2:
+                        diceroll.assign_dices(diceroll_1)
+                    elif turn == 3:
+                        diceroll.assign_dices(diceroll_2)
+                    diceroll.check_selected_get_random_numbers_and_insert(form.dice1.data, form.dice2.data, form.dice3.data, form.dice4.data, form.dice5.data)
+                    flash('Selected dices thrown')
+
+            elif form.throw_all.data:
+                diceroll.generate_all_rand_dices_and_insert_to_db()
+                dicerolls_lists.append(diceroll.return_dices_as_list())
+                flash('All dices thrown')
+
+            elif form.keep.data or form.cat_sel:
+                return redirect(url_for('category_blueprint.category', gameid=gameid, playerid=playerid))
+
             dicerolls_lists.append(diceroll.return_dices_as_list())
-            flash('All dices thrown')
+            if turn == 1:
+                session['diceroll_1_id'] = diceroll.id
+            elif turn == 2:
+                session['diceroll_2_id'] = diceroll.id
+            elif turn == 3:
+                session['diceroll_3_id'] = diceroll.id
+            turn += 1
+            return render_template('throw.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists, cat_results={})
 
-        elif form.keep.data or form.cat_sel:
-            return redirect(url_for('category_blueprint.category', gameid=gameid, playerid=playerid))
+        else:
 
-        dicerolls_lists.append(diceroll.return_dices_as_list())
-        if turn == 1:
-            session['diceroll_1_id'] = diceroll.id
-        elif turn == 2:
-            session['diceroll_2_id'] = diceroll.id
-        elif turn == 3:
-            session['diceroll_3_id'] = diceroll.id
-        turn += 1
-        return render_template('throw.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists, cat_results={})
+            if turn == 1:
+                diceroll.generate_all_rand_dices_and_insert_to_db()
+                dicerolls_lists.append(diceroll.return_dices_as_list())
+                flash('All dices thrown')
+                session['diceroll_1_id'] = diceroll.id
+                turn += 1
+                return render_template('computerthrow.html', title='Throw', form=form, turn=turn,
+                                       dices=dicerolls_lists, cat_results={})
 
-    return render_template('throw.html', title='Throw', form=form, turn=turn)
+            if turn == 2 or 3:
+                b = 4
+                return redirect(url_for('category_blueprint.category', gameid=gameid, playerid=playerid))
+                # wez 1. lub 2. diceroll i przeanalizuj co zrobic
+
+                #if wybor kategorii:
+                #   return redirect(url_for('category_blueprint.category', gameid=gameid, playerid=playerid))
+
+                # if throw selected:
+                #   przeanalizuj ktorymi i rzuc
+                #   dodaj diceroll 2 lub 3 do bazy
+
+                # if throw all:
+                #     diceroll.generate_all_rand_dices_and_insert_to_db()
+                #     dicerolls_lists.append(diceroll.return_dices_as_list())
+                #     flash('All dices thrown')
+                #     return render_template('computerthrow.html', title='Throw', form=form, turn=turn,
+                #                            dices=dicerolls_lists, cat_results={})
+                # dodaj 2 lub 3 rzut do bazy
+
+
+            # if form.comp_next_step.data:
+            #     if form.throw_sel.data:
+            #         if turn > 1:
+            #             diceroll = Diceroll()
+            #             if turn == 2:
+            #                 diceroll.assign_dices(diceroll_1)
+            #             elif turn == 3:
+            #                 diceroll.assign_dices(diceroll_2)
+            #             diceroll.check_selected_get_random_numbers_and_insert(form.dice1.data, form.dice2.data,
+            #                                                                   form.dice3.data, form.dice4.data,
+            #                                                                   form.dice5.data)
+            #             flash('Selected dices thrown')
+            #
+            #
+            #     elif form.keep.data or form.cat_sel:
+            #         return redirect(url_for('category_blueprint.category', gameid=gameid, playerid=playerid))
+            #
+            #
+            #     return render_template('computerthrow.html', title='Throw', form=form, turn=turn,
+            #                            dices=dicerolls_lists, cat_results={})
+
+            # dicerolls_lists.append(diceroll.return_dices_as_list())
+            # if turn == 1:
+            #     session['diceroll_1_id'] = diceroll.id
+            # elif turn == 2:
+            #     session['diceroll_2_id'] = diceroll.id
+            # elif turn == 3:
+            #     session['diceroll_3_id'] = diceroll.id
+            # turn += 1
+    if playerid in game.get_list_of_human_players_ids():
+        return render_template('throw.html', title='Throw', form=form, turn=turn)
+    else:
+        return render_template('computerthrow.html', title='Throw', form=form, turn=turn)

@@ -1,4 +1,4 @@
-
+import random
 
 class Category:
     names = ['aces',
@@ -40,10 +40,12 @@ class Category:
         self.upper_table_count(6, diceroll)
 
     def three_of_a_kind_count(self, diceroll):
-        self.result = sum(diceroll)
+        if len(set(diceroll)) <= 3:
+            self.result = sum(diceroll)
 
     def four_of_a_kind_count(self, diceroll):
-        self.result = sum(diceroll)
+        if len(set(diceroll)) <= 2: # todo: poprawic
+            self.result = sum(diceroll)
 
     def full_house_count(self, diceroll):
         if len(set(diceroll)) == 2:
@@ -69,8 +71,19 @@ class Category:
             if thrown_number == number:
                 self.result += number
 
-    def is_sublist(self, lst1, lst2):
-        ls1 = [element for element in lst1 if element in lst1]
-        ls2 = [element for element in lst2 if element in lst1]
-        if ls2 == ls1:
+    def is_sublist(self, lst1, lst2):   #todo: poprawic
+        ls1 = [element for element in lst1 if element in lst2]
+        ls2 = [element for element in lst2 if element in lst2]
+        if sorted(ls2) == sorted(ls1):
+        # if ls2 == ls1:
             return True
+
+    def choose_rand_cat_and_count_result(self, last_diceroll):
+        cat_alredy_chosen = True
+        while cat_alredy_chosen:
+            rand_cat_name = self.names[random.randint(0, 12)]
+                # if not found w bazie:
+                #  cat_already_chosen = False
+        getattr(self, rand_cat_name + '_count')(last_diceroll)
+        s = 5
+        return rand_cat_name

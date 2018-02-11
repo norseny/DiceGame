@@ -13,155 +13,176 @@
     <form action="" method="post">
         {{ form.hidden_tag() }}
 
-        <p>
-            {{ player_name }}, your last diceroll is: {{ last_diceroll }}
-        </p>
+        {% if computer[0] %}
+            <p>
+                '{{ player_name }}'s last diceroll was: {{ last_diceroll }}. Its choice was '{{ computer[1] }}'.
+            </p>
+        {% else %}
+            <p>
+                {{ player_name }}, your last diceroll is: {{ last_diceroll }}
+            </p>
+        {% endif %}
         <table>
             <thead>
                 <tr>
                     <td class="hide_me">Tick the box</td> {# todo: wygląd tabeli, optymalizacja, mozna zaznaczyc kilka checkboxów na raz! #}
                     <td>Name</td>
+                    <td>Combination</td>
                     <td>How counted</td>
-                    <td>Your result</td>
+                    <td>Result</td>
                 </tr>
             </thead>
             <tfoot>
                 <tr class="foot">
                     <td class="foot hide_me"></td>
                     <td class="foot left-border"></td>
-                    <td class="foot total">Total:</td>
+                    <td class="foot cat-description"></td>
+                    <td class="foot total cat-description">Total:</td>
                     <td>{{ sum(cat_results.values()) }}</td>
                 </tr>
             </tfoot>
             <tbody>
                 <tr>
-                    {% if cat_results['aces'] %}
+                    {% if 'aces' in cat_results %}
                         <td class="hide_me"></td>
                     {% else %}
                         <td class="hide_me">{{ form.aces }}</td>
                     {% endif %}
                     <td>{{ form.aces.label }}</td>
-                    <td>How counted</td>
+                    <td>Any combination</td>
+                    <td>The sum of dice with the number 1</td>
                     <td>{{ cat_results['aces'] }}</td>
                 </tr>
                 <tr>
-                    {% if cat_results['twos'] %}
+                    {% if 'twos' in cat_results %}
                         <td class="hide_me"></td>
                     {% else %}
                         <td class="hide_me">{{ form.twos }}</td>
                     {% endif %}
                     <td>{{ form.twos.label }}</td>
-                    <td>How counted</td>
+                    <td>Any combination</td>
+                    <td>The sum of dice with the number 2</td>
                     <td>{{ cat_results['twos'] }}</td>
                 </tr>
                 <tr>
-                    {% if cat_results['threes'] %}
+                    {% if 'threes' in cat_results %}
                         <td class="hide_me"></td>
                     {% else %}
                         <td class="hide_me">{{ form.threes }}</td>
                     {% endif %}
                     <td>{{ form.threes.label }}</td>
-                    <td>How counted</td>
+                    <td>Any combination</td>
+                    <td>The sum of dice with the number 3</td>
                     <td>{{ cat_results['threes'] }}</td>
                 </tr>
                 <tr>
-                    {% if cat_results['fours'] %}
+                    {% if 'fours' in cat_results%}
                         <td class="hide_me"></td>
                     {% else %}
                         <td class="hide_me">{{ form.fours }}</td>
                     {% endif %}
                     <td>{{ form.fours.label }}</td>
-                    <td>How counted</td>
+                    <td>Any combination</td>
+                    <td>The sum of dice with the number 4</td>
                     <td>{{ cat_results['fours'] }}</td>
                 </tr>
                 <tr>
-                    {% if cat_results['fives'] %}
+                    {% if 'fives' in cat_results %}
                         <td class="hide_me"></td>
                     {% else %}
                         <td class="hide_me">{{ form.fives }}</td>
                     {% endif %}
                     <td>{{ form.fives.label }}</td>
-                    <td>How counted</td>
+                    <td>Any combination</td>
+                    <td>The sum of dice with the number 5</td>
                     <td>{{ cat_results['fives'] }}</td>
                 </tr>
                 <tr>
-                    {% if cat_results['sixes'] %}
+                    {% if 'sixes' in cat_results %}
                         <td class="hide_me"></td>
                     {% else %}
                         <td class="hide_me">{{ form.sixes }}</td>
                     {% endif %}
                     <td>{{ form.sixes.label }}</td>
-                    <td>How counted</td>
+                    <td>Any combination</td>
+                    <td>The sum of dice with the number 6</td>
                     <td>{{ cat_results['sixes'] }}</td>
                 </tr>
                 <tr>
-                    {% if cat_results['three_of_a_kind'] %}
+                    {% if 'three_of_a_kind' in cat_results %}
                         <td class="hide_me"></td>
                     {% else %}
                         <td class="hide_me">{{ form.three_of_a_kind }}</td>
                     {% endif %}
                     <td>{{ form.three_of_a_kind.label }}</td>
-                    <td>How counted</td>
+                    <td>At least three dice the same</td>
+                    <td>Sum of all dice</td>
                     <td>{{ cat_results['three_of_a_kind'] }}</td>
                 </tr>
                 <tr>
-                    {% if cat_results['four_of_a_kind'] %}
+                    {% if 'four_of_a_kind' in cat_results %}
                         <td class="hide_me"></td>
                     {% else %}
                         <td class="hide_me">{{ form.four_of_a_kind }}</td>
                     {% endif %}
                     <td>{{ form.four_of_a_kind.label }}</td>
-                    <td>How counted</td>
+                    <td>At least four dice the same</td>
+                    <td>Sum of all dice</td>
                     <td>{{ cat_results['four_of_a_kind'] }}</td>
                 </tr>
                 <tr>
-                    {% if cat_results['full_house'] %}
+                    {% if 'full_house' in cat_results %}
                         <td class="hide_me"></td>
                     {% else %}
                         <td class="hide_me">{{ form.full_house }}</td>
                     {% endif %}
                     <td>{{ form.full_house.label }}</td>
-                    <td>How counted</td>
+                    <td>Three of one number and two of another</td>
+                    <td>25</td>
                     <td>{{ cat_results['full_house'] }}</td>
                 </tr>
                 <tr>
-                    {% if cat_results['small_straight'] %}
+                    {% if 'small_straight' in cat_results %}
                         <td class="hide_me"></td>
                     {% else %}
                         <td class="hide_me">{{ form.small_straight }}</td>
                     {% endif %}
                     <td>{{ form.small_straight.label }}</td>
-                    <td>How counted</td>
+                    <td>Four sequential dice (1-2-3-4, 2-3-4-5, or 3-4-5-6)</td>
+                    <td>30</td>
                     <td>{{ cat_results['small_straight'] }}</td>
                 </tr>
                 <tr>
-                    {% if cat_results['large_straight'] %}
+                    {% if 'large_straight' in cat_results %}
                         <td class="hide_me"></td>
                     {% else %}
                         <td class="hide_me">{{ form.large_straight }}</td>
                     {% endif %}
                     <td>{{ form.large_straight.label }}</td>
-                    <td>How counted</td>
+                    <td>Five sequential dice (1-2-3-4-5 or 2-3-4-5-6)</td>
+                    <td>40</td>
                     <td>{{ cat_results['large_straight'] }}</td>
                 </tr>
                 <tr>
-                    {% if cat_results['yahtzee'] %}
+                    {% if 'yahtzee' in cat_results %}
                         <td class="hide_me"></td>
                     {% else %}
                         <td class="hide_me">{{ form.yahtzee }}</td>
                     {% endif %}
                     <td>{{ form.yahtzee.label }}</td>
-                    <td>How counted</td>
+                    <td>All five dice the same</td>
+                    <td>50</td>
                     <td>{{ cat_results['yahtzee'] }}</td>
                 </tr>
                 <tr>
-                    {% if cat_results['chance'] %}
+                    {% if 'chance' in cat_results %}
                         <td class="hide_me"></td>
                     {% else %}
                         <td class="hide_me">{{ form.chance }}</td>
                     {% endif %}
                     <td>{{ form.chance.label }}</td>
-                    <td>How counted</td>
+                    <td>Any combination</td>
+                    <td>Sum of all dice</td>
                     <td>{{ cat_results['chance'] }}</td>
                 </tr>
             </tbody>
@@ -171,11 +192,11 @@
         <p>
             <span class="hide_me"> {{ form.submit_the_box() }} </span>
         </p>
-        {% if hide_checkboxes %}
+{#        {% if hide_checkboxes %}#}
             <p>
                 {{ form.submit_next_player() }}
             </p>
-        {% endif %}
+{#        {% endif %}#}
 
     </form>
 

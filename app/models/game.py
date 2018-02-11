@@ -89,7 +89,7 @@ class Gameresult(db.Model):
     def __repr__(self):
         return '<Gameresult {} {} {}>'.format(self.game_id, self.player_id, self.result)
 
-    def update_results(self, gameid):
+    def update_results(self, gameid): # todo: dodatkowe punkty za cośtam
         game = Game.query.get(gameid)
         players_ids = game.get_list_of_all_players_ids()
         for player_id in players_ids:

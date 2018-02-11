@@ -33,31 +33,13 @@
                 {% endfor %}
             </p>
         {% endif %}
-        {% if turn != 1 and turn < 4%}
-            <p class="select-dice">
-                Select the dices you want to throw again:
-            </p>
-            <p>
-                <span class="dice-choose">{{ form.dice1.description }}{{ form.dice1 }}</span>
-                <span class="dice-choose">{{ form.dice2.description }}{{ form.dice2 }}</span>
-                <span class="dice-choose">{{ form.dice3.description }}{{ form.dice3 }}</span>
-                <span class="dice-choose">{{ form.dice4.description }}{{ form.dice4 }}</span>
-                <span class="dice-choose">{{ form.dice5.description }}{{ form.dice5 }}</span>
-            </p>
-            <p>
-                {{ form.throw_sel() }}
-            </p>
-            <p>
-                {{ form.keep() }}
-            </p>
-        {% endif %}
-        {% if turn < 4%}
         <p>
-            {{ form.throw_all() }}
+            {% if turn == 1 %}
+            <p>
+            Computer is ready and steady. Its first step was to sit in front of itself...
+            </p>
+            {% endif %}
+            {{ form.comp_next_step() }}
         </p>
-        {% endif %}
-        {% if turn == 4 %}
-           {{ form.cat_sel() }} {# todo zamienic na keep, po co 2 submity, jak mozna zmienic label#}
-        {% endif %}
     </form>
 {% endblock %}

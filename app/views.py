@@ -55,7 +55,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations, you are now a registered user')
+        flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
@@ -99,16 +99,16 @@ def playersnames(gameid):
             hplayers_no = session['hplayers']
         session.pop('hplayers', None)
 
-        flash('Human players: {} and {} created'.format(form.player_name1.data, form.player_name2.data))
-
         session.pop('diceroll_1_id', None)
         session.pop('diceroll_2_id', None)
         session.pop('diceroll_3_id', None)
         # todo: lepiej przechowac to wszystko w liscie session['game_data']
-        session['game_turn'] = 1 # todo może niepotrzebne
+        # session['game_turn'] = 1 # todo może niepotrzebne
         game = Game.query.get(gameid)
         hplayers_ids = game.get_list_of_human_players_ids()
         curr_player_id = hplayers_ids[0]
+
+        flash('Human players: {} and {} created. The current player is: {}'.format(form.player_name1.data, form.player_name2.data, form.player_name1.data)) # todo: sprawdzic czy na pewno pierwszy to ten wypisany
 
         return redirect(url_for('throw_blueprint.throw', gameid=gameid ,playerid=curr_player_id))
     return render_template('playersnames.html', title='Players Names', form=form, hplayers_no=hplayers_no)
@@ -117,13 +117,14 @@ def playersnames(gameid):
 @app.route('/gameend/<int:gameid>', methods=['GET', 'POST'])
 def gameend(gameid):
 
-    gameresults = Gameresult.query.filter_by(game_id=gameid).all()
+    gameresults_all = Gameresult.query.filter_by(game_id=gameid).all()
     gameresults_dict = {}
 
-    for el in gameresults:
+    for el in gameresults_all:
         if isinstance(el, Gameresult):
             player = Player.query.get(int(el.player_id))
             gameresults_dict[player.player_name] = el.result
+
     return render_template('gameend.html', title='End of the game', gameresults_dict=gameresults_dict)
 
 
