@@ -53,7 +53,7 @@ class Category:
         if len(set(diceroll)) == 2:
             self.result = 25
 
-    def small_straight_count(self, diceroll):
+    def small_straight_count(self, diceroll): #todo:
         if self.is_sublist(list(range(1, 5)), diceroll) or self.is_sublist(list(range(2, 6)), diceroll) or self.is_sublist(list(range(3, 7)), diceroll):
             n = 7
             self.result = 30

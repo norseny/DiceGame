@@ -5,6 +5,7 @@ from app import app
 from app.forms import *
 from app.models.user import *
 from app.models.diceroll import *
+from app.models.player import *
 from app.throw import throw_blueprint
 from app.category import category_blueprint
 
@@ -78,46 +79,40 @@ def newgame():
 
 @app.route('/playersnames/<int:gameid>', methods=['GET', 'POST'])
 def playersnames(gameid):
-    hplayers_no = 0
 
     form = PlayersNamesForm()
     if form.validate_on_submit():
 
-        player = Player(player_name=form.player_name1.data)
-        db.session.add(player)
-        db.session.commit()
-        game_result = Gameresult(game_id=gameid, player_id=player.id)
-        db.session.add(game_result)
-        db.session.commit()
+        human_players = form.players.data[::]
+        human_players.insert(0, current_user.username)
+        for player in human_players:
+            human_player = HumanPlayer(player_name=player)
+            human_player.insert_player_to_db(gameid)
 
-        player = Player(player_name=form.player_name2.data)
-        db.session.add(player)
-        db.session.commit()
-        game_result = Gameresult(game_id=gameid, player_id=player.id)
-        db.session.add(game_result)
-        db.session.commit()
+        game = Game.query.get(gameid)
 
-        if session.get('hplayers'):
-            hplayers_no = session['hplayers']
-            session.pop('hplayers', None)
+        human_players_ids = game.get_list_of_human_players_ids()
+
+        if session.get('cplayers'):
+            computer_player = ComputerPlayer()
+            computer_player.create_cplayers(gameid, session['cplayers'], form.computer_ai.data)
+            session.pop('cplayers', None)
 
         session.pop('diceroll_1_id', None)
         session.pop('diceroll_2_id', None)
         session.pop('diceroll_3_id', None) # todo: lepiej przechowac to w liscie session['game_data']
-        game = Game.query.get(gameid)
-        hplayers_ids = game.get_list_of_human_players_ids()
-        curr_player_id = hplayers_ids[0]
 
-        if session.get('cplayers'):
-            game.create_cplayers(session['cplayers'], form.computer_ai.data)
-            cplayers_no = session['cplayers']
-            session.pop('cplayers', None)
+        flash('Players created. The current player is: {}'.format(human_players[0]))
 
-        flash('Human players: {}, {} and {} {} computer players created. The current player is: {}'.format(
-            form.player_name1.data, form.player_name2.data, cplayers_no, form.computer_ai.data, form.player_name1.data)) # todo: sprawdzic czy na pewno pierwszy to ten wypisany
+        return redirect(url_for('throw_blueprint.throw', gameid=gameid ,playerid=human_players_ids[0]))
 
-        return redirect(url_for('throw_blueprint.throw', gameid=gameid ,playerid=curr_player_id))
-    return render_template('playersnames.html', title='Players Names', form=form, hplayers_no=hplayers_no)
+    if session.get('hplayers'):
+        form.players.entries[0] = current_user.username
+        for i in range(1, session['hplayers']):
+            form.players.append_entry()
+        session.pop('hplayers', None)
+
+    return render_template('playersnames.html', title='Players Names', form=form)
 
 
 @app.route('/gameend/<int:gameid>', methods=['GET', 'POST'])
@@ -134,20 +129,20 @@ def gameend(gameid):
     return render_template('gameend.html', title='End of the game', gameresults_dict=gameresults_dict)
 
 
-@app.route('/process', methods=['POST'])
-def process():
-
-    human_players = request.form['human_players']
-
-    if human_players:
-        success = str(human_players)
-
-        return jsonify({'name': success})
-    return jsonify({'error': 'Missing data!'})
-
-
-@app.route('/_add_numbers')
-def add_numbers():
-    a = request.args.get('a', 0, type=int)
-    b = request.args.get('b', 0, type=int)
-    return jsonify(result=a + b)
+# @app.route('/process', methods=['POST'])
+# def process():
+#
+#     human_players = request.form['human_players']
+#
+#     if human_players:
+#         success = str(human_players)
+#
+#         return jsonify({'name': success})
+#     return jsonify({'error': 'Missing data!'})
+#
+#
+# @app.route('/_add_numbers')
+# def add_numbers():
+#     a = request.args.get('a', 0, type=int)
+#     b = request.args.get('b', 0, type=int)
+#     return jsonify(result=a + b)

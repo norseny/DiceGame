@@ -4,9 +4,12 @@
     {% if hide_checkboxes %}
         <style>
         .hide_me {
-            visibility: hidden
+            display: none;
         }
         </style>
+        <h1>The results</h1>
+    {% else %}
+        <h1>{{ title }}</h1>
     {% endif %}
 
     <h1>{{ title }}</h1>

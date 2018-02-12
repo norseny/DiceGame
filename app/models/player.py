@@ -4,15 +4,13 @@ from app.models.diceroll import *
 
 
 class HumanPlayer(Player):
-
-    def __init__(self, id):
-        self.id = id
+    pass
 
 
 class ComputerPlayer(Player):
 
-    def __init__(self, id):
-        self.id = id
+    # def __init__(self, id):
+    #     self.id = id
 
     def dummy(self):
         return True
@@ -23,6 +21,12 @@ class ComputerPlayer(Player):
         elif 'Smart' in self.player_name:
             curr_pl = ComputerPlayerSmart.query.get(int(self.id))
         return curr_pl
+
+    def create_cplayers(self, game_id, cp_no, computer_ai_type):
+        for comp in range(1, int(cp_no)+1):
+            computer_player = ComputerPlayer(player_name=str(computer_ai_type)+' Computer Player '+str(comp), computer_player=True)
+            computer_player.insert_player_to_db(game_id)
+            c =6
 
 
 class ComputerPlayerDummy(ComputerPlayer):

@@ -22,11 +22,15 @@ def throw(gameid, playerid):
             diceroll_2 = Diceroll.query.get(session['diceroll_2_id'])
             dicerolls_lists.append(diceroll_2.return_dices_as_list())
             turn = 3
+            if session.get('diceroll_3_id'):
+                return redirect(url_for('category_blueprint.category', gameid=gameid, playerid=playerid))
 
     game = Game.query.get(int(gameid))
+
     form = ThrowForm()
     if form.validate_on_submit():
         diceroll = Diceroll()
+
         if playerid in game.get_list_of_human_players_ids():
 
             if form.throw_sel.data:
@@ -66,10 +70,11 @@ def throw(gameid, playerid):
             return render_template('throw.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists, cat_results={})
 
         else:
-            computer_player = ComputerPlayer.query.get(int(playerid))
+            computer_player = ComputerPlayer.query.get(int(playerid)) #todo ?...
             curr_computer_player = computer_player.check_ai_and_return_object()
 
             choice = 0
+
             if (turn == 2) or (turn == 3):
                 choice = random.randint(1,3)
 
@@ -85,7 +90,7 @@ def throw(gameid, playerid):
                 turn += 1
                 return render_template('computerthrow.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists, cat_results={})
 
-            elif (choice == 2) and (turn == 2) or (turn == 3): # wybór czym rzucić
+            elif (choice == 2) and ((turn == 2) or (turn == 3)): # wybór czym rzucić
                 if isinstance(curr_computer_player, ComputerPlayerDummy):
                     if turn == 2:
                         diceroll.assign_dices(diceroll_1)
@@ -94,11 +99,11 @@ def throw(gameid, playerid):
                     ticked_boxes = curr_computer_player.randomly_select_dices(diceroll)
                     dicerolls_lists.append(diceroll.return_dices_as_list())
                     flash('Computer selected dices with number(/s): {} to throw again'.format(sorted(ticked_boxes)))
-                    turn += 1
                     if turn == 2:
                         session['diceroll_2_id'] = diceroll.id
                     elif turn == 3:
                         session['diceroll_3_id'] = diceroll.id
+                    turn += 1
                 return render_template('computerthrow.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists, cat_results={})
 
             elif (choice == 3) or (turn == 4): # wybór kategorii

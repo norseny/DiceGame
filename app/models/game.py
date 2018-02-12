@@ -1,5 +1,6 @@
 from app import db
 from sqlalchemy import func
+from flask_login import current_user
 
 class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -29,30 +30,33 @@ class Player(db.Model):
     def get_no_of_turns(self, gameid):
         return Turn.query.filter_by(game_id=gameid, player_id=self.id).count()
 
+    def insert_player_to_db(self, gameid):
+        existing_player = Player.query.filter_by(player_name=self.player_name).first()
+        if existing_player is None:
+            insert_to_db(self)
+            id_to_db = self.id
+            insert_to_db(self)
+        else:
+            id_to_db = existing_player.id
+        game_result = Gameresult(game_id=gameid, player_id=id_to_db)
+        insert_to_db(game_result)
+
+
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
     game_results = db.relationship('Gameresult', backref='game', lazy='dynamic')
     game_round = db.relationship('Turn', backref='game', lazy='dynamic')
+    # todo: dorobic date
 
     def __init__(self):
+        # self.name = current_user.username + "'s game" + 'id ' + str(self.id)
         insert_to_db(self)
-        self.name = 'Game ' + str(self.id)
+        self.name = current_user.username + "'s game " + 'id ' + str(self.id)
+        db.session.commit()
 
     def __repr__(self):
         return '<Game {}>'.format(self.name)
-
-    def create_cplayers(self, cp_no, computer_ai_type):
-        for comp in range(1, int(cp_no)+1):
-            player = Player(player_name=str(computer_ai_type)+' Computer Player '+str(comp), computer_player=True)
-            existing_player = Player.query.filter_by(player_name=player.player_name).first()
-            if existing_player is None:
-                insert_to_db(player)
-                id_to_db = player.id
-            else:
-                id_to_db = existing_player.id
-            game_result = Gameresult(game_id=self.id, player_id=id_to_db)
-            insert_to_db(game_result)
 
     def get_list_of_all_players_ids(self):
         game_player_relation = Gameresult.query.filter_by(game_id=self.id).all()
