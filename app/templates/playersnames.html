@@ -18,29 +18,33 @@
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
-        {% if hplayers_no > 2 %}
-            <p>
-                {{ form.player_name3.label }}
-                {{ form.player_name3() }}
-                {% for error in form.player_name3.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}
-            </p>
-                <p>
-                {{ form.player_name4.label }}
-                {{ form.player_name4() }}
-                {% for error in form.player_name4.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}
-            </p>
-            <p>
-                {{ form.player_name5.label }}
-                {{ form.player_name5() }}
-                {% for error in form.player_name5.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}
-            </p>
-        {% endif %}
+{#        {% if hplayers_no > 2 %}#}
+{#            <p>#}
+{#                {{ form.player_name3.label }}#}
+{#                {{ form.player_name3() }}#}
+{#                {% for error in form.player_name3.errors %}#}
+{#                <span style="color: red;">[{{ error }}]</span>#}
+{#                {% endfor %}#}
+{#            </p>#}
+{#                <p>#}
+{#                {{ form.player_name4.label }}#}
+{#                {{ form.player_name4() }}#}
+{#                {% for error in form.player_name4.errors %}#}
+{#                <span style="color: red;">[{{ error }}]</span>#}
+{#                {% endfor %}#}
+{#            </p>#}
+{#            <p>#}
+{#                {{ form.player_name5.label }}#}
+{#                {{ form.player_name5() }}#}
+{#                {% for error in form.player_name5.errors %}#}
+{#                <span style="color: red;">[{{ error }}]</span>#}
+{#                {% endfor %}#}
+{#            </p>#}
+{#        {% endif %}#}
+        <p>
+            {{ form.computer_ai.label }}
+            {{ form.computer_ai }}
+        </p>
         <p>
             {{ form.throw() }}
         </p>

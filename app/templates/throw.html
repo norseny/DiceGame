@@ -45,12 +45,25 @@
                 <span class="dice-choose">{{ form.dice5.description }}{{ form.dice5 }}</span>
             </p>
             <p>
+                {{ form.dices }}
+            </p>
+            <p>
                 {{ form.throw_sel() }}
             </p>
             <p>
                 {{ form.keep() }}
             </p>
         {% endif %}
+{#                <p>#}
+{#                {{ form.dices }}#}
+{#            </p>#}
+
+{#    {% for subfield in form.dices %}#}
+{#    <tr>#}
+{#        <td>{{ subfield }}</td>#}
+{#        <td>{{ subfield.label }}</td>#}
+{#    </tr>#}
+{#    {% endfor %}#}
         {% if turn < 4%}
         <p>
             {{ form.throw_all() }}

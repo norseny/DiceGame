@@ -12,7 +12,7 @@
             <h2>Thrown dices:</h2>
             <h3>Diceroll 1:</h3>
             <p class="dice-result">
-                {% for dice in dices[0] %}
+                {% for dice in dices[0] %} {# todo: chyba mozna tu uzyc context variable zamiast przesylac tu dices #}
                      <span class="dice">Dice {{loop.index}}:</span> <span class="dice-number-result">{{ dice }}</span>
                 {% endfor %}
             </p>

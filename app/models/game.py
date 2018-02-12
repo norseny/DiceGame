@@ -35,17 +35,16 @@ class Game(db.Model):
     game_results = db.relationship('Gameresult', backref='game', lazy='dynamic')
     game_round = db.relationship('Turn', backref='game', lazy='dynamic')
 
-    def __init__(self, name, cp_no=0):
-        self.name = name
+    def __init__(self):
         insert_to_db(self)
-        self.create_cplayers(cp_no)
+        self.name = 'Game ' + str(self.id)
 
     def __repr__(self):
         return '<Game {}>'.format(self.name)
 
-    def create_cplayers(self, cp_no):
+    def create_cplayers(self, cp_no, computer_ai_type):
         for comp in range(1, int(cp_no)+1):
-            player = Player(player_name='Computer Player '+str(comp), computer_player=True)
+            player = Player(player_name=str(computer_ai_type)+' Computer Player '+str(comp), computer_player=True)
             existing_player = Player.query.filter_by(player_name=player.player_name).first()
             if existing_player is None:
                 insert_to_db(player)

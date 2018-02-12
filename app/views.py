@@ -65,10 +65,12 @@ def newgame():
     form = NewGameForm()
     if form.validate_on_submit():
 
-        game = Game(name=form.name.data, cp_no=form.computer_players.data)
+        # game = Game(name=form.name.data)
+        game = Game()
+        session['cplayers'] = form.computer_players.data
         session['hplayers'] = form.human_players.data
         # session['player_no'] = 0
-        flash('New game "{}" and {} computer players created'.format(game.name, form.computer_players.data))
+        flash('New game "{}" created'.format(game.name))
 
         return redirect(url_for('playersnames', gameid=game.id))
     return render_template('newgame.html', title='New Game', form=form)
@@ -97,18 +99,22 @@ def playersnames(gameid):
 
         if session.get('hplayers'):
             hplayers_no = session['hplayers']
-        session.pop('hplayers', None)
+            session.pop('hplayers', None)
 
         session.pop('diceroll_1_id', None)
         session.pop('diceroll_2_id', None)
-        session.pop('diceroll_3_id', None)
-        # todo: lepiej przechowac to wszystko w liscie session['game_data']
-        # session['game_turn'] = 1 # todo może niepotrzebne
+        session.pop('diceroll_3_id', None) # todo: lepiej przechowac to w liscie session['game_data']
         game = Game.query.get(gameid)
         hplayers_ids = game.get_list_of_human_players_ids()
         curr_player_id = hplayers_ids[0]
 
-        flash('Human players: {} and {} created. The current player is: {}'.format(form.player_name1.data, form.player_name2.data, form.player_name1.data)) # todo: sprawdzic czy na pewno pierwszy to ten wypisany
+        if session.get('cplayers'):
+            game.create_cplayers(session['cplayers'], form.computer_ai.data)
+            cplayers_no = session['cplayers']
+            session.pop('cplayers', None)
+
+        flash('Human players: {}, {} and {} {} computer players created. The current player is: {}'.format(
+            form.player_name1.data, form.player_name2.data, cplayers_no, form.computer_ai.data, form.player_name1.data)) # todo: sprawdzic czy na pewno pierwszy to ten wypisany
 
         return redirect(url_for('throw_blueprint.throw', gameid=gameid ,playerid=curr_player_id))
     return render_template('playersnames.html', title='Players Names', form=form, hplayers_no=hplayers_no)

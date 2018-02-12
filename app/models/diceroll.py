@@ -1,7 +1,7 @@
 from app import db
 import random
 from app.models import game as models
-
+from flask import session
 
 class Diceroll(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -46,15 +46,25 @@ class Diceroll(db.Model):
         self.dice5 = source_diceroll.dice5
 
 
-    def check_selected_get_random_numbers_and_insert(self, d1, d2, d3, d4, d5):
-        if d1:
+    def check_selected_get_random_numbers_and_insert(self, dices):
+        if dices[0]:
             self.dice1 = random.randint(1, 6)
-        if d2:
+        if dices[1]:
             self.dice2 = random.randint(1, 6)
-        if d3:
+        if dices[2]:
             self.dice3 = random.randint(1, 6)
-        if d4:
+        if dices[3]:
             self.dice4 = random.randint(1, 6)
-        if d5:
+        if dices[4]:
             self.dice5 = random.randint(1, 6)
         models.insert_to_db(self)
+
+    def throw_all_rand(self):
+        self.generate_all_rand_dices_and_insert_to_db()
+        # if 'diceroll_1_id' not in session: #todo: sprawdzic czy na pewno nie moze tu byc
+        #     session['diceroll_1_id'] = self.id
+        # elif 'diceroll_2_id' not in session:
+        #     session['diceroll_2_id'] = self.id
+        # else:
+        #     session['diceroll_3_id'] = self.id
+        return self.return_dices_as_list()

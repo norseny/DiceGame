@@ -1,4 +1,5 @@
 import random
+from app.models.game import *
 
 class Category:
     names = ['aces',
@@ -44,7 +45,8 @@ class Category:
             self.result = sum(diceroll)
 
     def four_of_a_kind_count(self, diceroll):
-        if len(set(diceroll)) <= 2: # todo: poprawic
+        diceroll_unique = list(set(diceroll)) 
+        if (len(diceroll_unique) < 2 and diceroll.count(diceroll_unique[0]) == 5) or ( len(diceroll_unique) <= 2 and ( (diceroll.count(diceroll_unique[0]) == 4) or (diceroll.count(diceroll_unique[1]) == 4) ) ):
             self.result = sum(diceroll)
 
     def full_house_count(self, diceroll):
@@ -53,6 +55,7 @@ class Category:
 
     def small_straight_count(self, diceroll):
         if self.is_sublist(list(range(1, 5)), diceroll) or self.is_sublist(list(range(2, 6)), diceroll) or self.is_sublist(list(range(3, 7)), diceroll):
+            n = 7
             self.result = 30
 
     def large_straight_count(self, diceroll):
@@ -71,19 +74,18 @@ class Category:
             if thrown_number == number:
                 self.result += number
 
-    def is_sublist(self, lst1, lst2):   #todo: poprawic
+    def is_sublist(self, lst1, lst2):
         ls1 = [element for element in lst1 if element in lst2]
-        ls2 = [element for element in lst2 if element in lst2]
+        ls2 = [element for element in lst2 if element in lst1]
+        ls2 = list(set(ls2))
         if sorted(ls2) == sorted(ls1):
-        # if ls2 == ls1:
             return True
 
-    def choose_rand_cat_and_count_result(self, last_diceroll):
+    def choose_rand_cat_and_count_result(self, last_diceroll, gameid, playerid):
         cat_alredy_chosen = True
         while cat_alredy_chosen:
             rand_cat_name = self.names[random.randint(0, 12)]
-                # if not found w bazie:
-                #  cat_already_chosen = False
+            if not Turn.query.filter_by(game_id=gameid, player_id=playerid, category=rand_cat_name).count():
+                cat_alredy_chosen = False
         getattr(self, rand_cat_name + '_count')(last_diceroll)
-        s = 5
         return rand_cat_name

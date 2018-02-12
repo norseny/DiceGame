@@ -15,7 +15,8 @@
 
         {% if computer[0] %}
             <p>
-                '{{ player_name }}'s last diceroll was: {{ last_diceroll }}. Its choice was '{{ computer[1] }}'.
+                '{{ player_name }}'s last diceroll was: {{ last_diceroll }}. Its category choice was '{{ computer[1]
+                    }}'.
             </p>
         {% else %}
             <p>
@@ -192,11 +193,11 @@
         <p>
             <span class="hide_me"> {{ form.submit_the_box() }} </span>
         </p>
-{#        {% if hide_checkboxes %}#}
+        {% if hide_checkboxes %}
             <p>
                 {{ form.submit_next_player() }}
             </p>
-{#        {% endif %}#}
+        {% endif %}
 
     </form>
 
