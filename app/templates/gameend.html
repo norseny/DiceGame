@@ -3,8 +3,7 @@
 {%  block content %}
     <h1>{{ title }}</h1>
     <table>
-        <caption>End of the game! Here are some results:
-        </caption>
+        <caption>Here are some results:</caption>
         <thead>
             <tr>
                 <th>Player name</th>
@@ -21,6 +20,6 @@
         </tbody>
     </table>
 
-    <p>New Game? <a href="{{ url_for('newgame') }}"> Click to Play!</a></p>
+    <p>New Game? <a href="{{ url_for('newgame') }}">Click to Play!</a></p>
 
 {% endblock %}

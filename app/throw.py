@@ -72,7 +72,7 @@ def throw(gameid, playerid):
             disabled_categories = list(human_player.generate_dict_of_part_results(gameid).keys())
 
             return render_template('throw.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists,
-                                   disabled_categories=disabled_categories)
+                                   disabled_categories=disabled_categories, gameid=gameid)
 
         else:
             computer_player = ComputerPlayer.query.get(int(playerid)) #todo ?...
@@ -93,7 +93,8 @@ def throw(gameid, playerid):
                     session['diceroll_3_id'] = diceroll.id
                 flash('All dices thrown')
                 turn += 1
-                return render_template('computerthrow.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists)
+                return render_template('computerthrow.html', title='Throw', form=form, turn=turn,
+                                       dices=dicerolls_lists, gameid=gameid)
 
             elif (choice == 2) and ((turn == 2) or (turn == 3)): # wybór czym rzucić
                 if isinstance(curr_computer_player, ComputerPlayerDummy):
@@ -109,13 +110,33 @@ def throw(gameid, playerid):
                     elif turn == 3:
                         session['diceroll_3_id'] = diceroll.id
                     turn += 1
-                return render_template('computerthrow.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists)
+
+                elif isinstance(curr_computer_player,ComputerPlayerSmart): #todo: sth
+                    if turn == 2:
+                        diceroll.assign_dices(diceroll_1)
+                    elif turn == 3:
+                        diceroll.assign_dices(diceroll_2)
+
+                    dum_comp = ComputerPlayerDummy()
+                    ticked_boxes = dum_comp.randomly_select_dices(diceroll) #todo:
+
+
+                    dicerolls_lists.append(diceroll.return_dices_as_list())
+                    flash('Computer selected dices with number(/s): {} to throw again'.format(sorted(ticked_boxes)))
+                    if turn == 2:
+                        session['diceroll_2_id'] = diceroll.id
+                    elif turn == 3:
+                        session['diceroll_3_id'] = diceroll.id
+                    turn += 1
+
+                return render_template('computerthrow.html', title='Throw', form=form, turn=turn,
+                                       dices=dicerolls_lists, gameid=gameid)
 
             elif (choice == 3) or (turn == 4): # wybór kategorii
                 return redirect(url_for('category_blueprint.category', gameid=gameid, playerid=playerid))
     if playerid in game.get_list_of_human_players_ids():
         human_player = HumanPlayer.query.get(int(playerid))
         disabled_categories = list(human_player.generate_dict_of_part_results(gameid).keys())
-        return render_template('throw.html', title='Throw', form=form, turn=turn, disabled_categories=disabled_categories)
+        return render_template('throw.html', title='Throw', form=form, turn=turn, disabled_categories=disabled_categories, gameid=gameid)
     else:
-        return render_template('computerthrow.html', title='Throw', form=form, turn=turn)
+        return render_template('computerthrow.html', title='Throw', form=form, turn=turn, gameid=gameid)

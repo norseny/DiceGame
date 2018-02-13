@@ -60,20 +60,20 @@ def category(gameid, playerid):
             curr_computer_player = computer_player.check_ai_and_return_object()
 
             if isinstance(curr_computer_player, ComputerPlayerDummy):
-                cat_name = category.choose_rand_cat_and_count_result(last_diceroll, gameid, computer_player.id)
+                picked_category = curr_computer_player.choose_rand_cat_and_count_result(last_diceroll, gameid)
 
             elif isinstance(curr_computer_player, ComputerPlayerSmart):
-                cat_name = category.choose_cat_and_count_result(last_diceroll) #todo
+                picked_category = curr_computer_player.choose_cat_and_count_result(last_diceroll, gameid)
 
             for radio in choices:
-                if radio.label == cat_name:
-                    radio.result = category.result
+                if radio.label == picked_category['name']:
+                    radio.result = picked_category['result']
                     total += radio.result
 
-            curr_computer_player.insert_part_result(gameid, cat_name, category.result, first_dice_id, second_dice_id, third_dice_id)
+            curr_computer_player.insert_part_result(gameid, picked_category['name'], picked_category['result'], first_dice_id, second_dice_id, third_dice_id)
             hide_checkboxes = True
             comp.append(True)
-            comp.append(cat_name)
+            comp.append(picked_category['name'])
 
 
     if form.validate_on_submit():
@@ -88,7 +88,8 @@ def category(gameid, playerid):
                     hide_checkboxes = True
                     total += radio.result
 
-                    return render_template('category.html', title='Category Selection', form=form,hide_checkboxes=hide_checkboxes, player_name=player.player_name, last_diceroll=last_diceroll, total=total, computer=comp, choices=choices, hasattr=hasattr)
+                    return render_template('category.html', title='Category Selection', form=form,hide_checkboxes=hide_checkboxes, player_name=player.player_name, last_diceroll=last_diceroll, total=total, computer=comp, choices=choices,
+                                           hasattr=hasattr, gameid=gameid)
 
         elif form.submit_next_player.data: # todo: przycisk label end of the game jak juz wszyscy rzucili
 
@@ -100,8 +101,8 @@ def category(gameid, playerid):
                 playerid = players[int(curr_player_pos + 1)]
             else:
                 if 13 == player.get_no_of_turns(gameid):
-                    gameresult = Gameresult()
-                    gameresult.update_results(gameid)
+                    # gameresult = Gameresult()
+                    # gameresult.update_results(gameid)
                     return redirect(url_for('gameend', gameid=gameid))
                 else:
                     playerid = players[0]
@@ -114,4 +115,5 @@ def category(gameid, playerid):
             flash('The current player is: {}'.format(player_name))
             return redirect(url_for('throw_blueprint.throw', gameid=gameid, playerid=playerid))
 
-    return render_template('category.html', title='Category Selection', form=form, hide_checkboxes=hide_checkboxes, player_name=player.player_name, last_diceroll=last_diceroll, total=total, computer=comp, choices=choices, hasattr=hasattr)
+    return render_template('category.html', title='Category Selection', form=form, hide_checkboxes=hide_checkboxes, player_name=player.player_name, last_diceroll=last_diceroll, total=total, computer=comp, choices=choices,
+                           hasattr=hasattr, gameid=gameid)

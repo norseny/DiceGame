@@ -117,6 +117,8 @@ def playersnames(gameid):
 @app.route('/gameend/<int:gameid>', methods=['GET', 'POST'])
 def gameend(gameid):
 
+    gameresult = Gameresult()
+    gameresult.update_results(gameid)
     gameresults_all = Gameresult.query.filter_by(game_id=gameid).all()
     gameresults_dict = {}
 

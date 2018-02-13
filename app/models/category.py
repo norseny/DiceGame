@@ -22,38 +22,44 @@ class Category:
         self.result = 0
 
     def aces_count(self, diceroll):
-        self.upper_table_count(1, diceroll)
+        self.upper_table_sum(1, diceroll)
 
     def twos_count(self, diceroll):
-        self.upper_table_count(2, diceroll)
+        self.upper_table_sum(2, diceroll)
 
     def threes_count(self, diceroll):
-        self.upper_table_count(3, diceroll)
+        self.upper_table_sum(3, diceroll)
 
     def fours_count(self, diceroll):
-        self.upper_table_count(4, diceroll)
+        self.upper_table_sum(4, diceroll)
 
     def fives_count(self, diceroll):
-        self.upper_table_count(5, diceroll)
+        self.upper_table_sum(5, diceroll)
 
     def sixes_count(self, diceroll):
-        self.upper_table_count(6, diceroll)
+        self.upper_table_sum(6, diceroll)
 
     def three_of_a_kind_count(self, diceroll):
         if len(set(diceroll)) <= 3:
             for dice in diceroll:
                 if diceroll.count(dice) == 3:
                     self.result = sum(diceroll)
+        else:
+            self.result = 0
 
     def four_of_a_kind_count(self, diceroll):
         if len(set(diceroll)) <= 2:
             for dice in diceroll:
                 if diceroll.count(dice) == 4:
                     self.result = sum(diceroll)
+        else:
+            self.result = 0
 
     def full_house_count(self, diceroll):
         if len(set(diceroll)) == 2:
             self.result = 25
+        else:
+            self.result = 0
 
     def small_straight_count(self, diceroll):
         diceroll_set = set(diceroll)
@@ -64,6 +70,9 @@ class Category:
         for my_set in list_of_sets:
             if self.check_if_subset(diceroll_set, my_set):
                 self.result = 30
+                return None
+            else:
+                self.result = 0
 
     def large_straight_count(self, diceroll):
         diceroll_set = set(diceroll)
@@ -73,15 +82,21 @@ class Category:
         for my_set in list_of_sets:
             if self.check_if_subset(diceroll_set, my_set):
                 self.result = 40
+                return None
+            else:
+                self.result = 0
 
     def yahtzee_count(self, diceroll):
         if len(set(diceroll)) == 1:
             self.result = 50
+        else:
+            self.result = 0
 
     def chance_count(self, diceroll):
         self.result = sum(diceroll)
 
-    def upper_table_count(self, number, diceroll):
+    def upper_table_sum(self, number, diceroll):
+        self.result = 0
         for thrown_number in diceroll:
             if thrown_number == number:
                 self.result += number
@@ -90,12 +105,12 @@ class Category:
         return my_set.issubset(diceroll_set)
 
 
-    def choose_rand_cat_and_count_result(self, last_diceroll, gameid, playerid):
-        cat_already_chosen = True
-        while cat_already_chosen:
-            rand_cat_name = self.category_details[random.randint(0, 12)]['label']
-            if not Turn.query.filter_by(game_id=gameid, player_id=playerid, category=rand_cat_name).count():
-                cat_already_chosen = False
-                method_name = (rand_cat_name.lower()).replace(' ', '_')
-        getattr(self, method_name + '_count')(last_diceroll)
-        return rand_cat_name
+    # def choose_rand_cat_and_count_result(self, last_diceroll, gameid, playerid):
+    #     cat_already_chosen = True
+    #     while cat_already_chosen:
+    #         rand_cat_name = self.category_details[random.randint(0, 12)]['label']
+    #         if not Turn.query.filter_by(game_id=gameid, player_id=playerid, category=rand_cat_name).count():
+    #             cat_already_chosen = False
+    #             method_name = (rand_cat_name.lower()).replace(' ', '_')
+    #     getattr(self, method_name + '_count')(last_diceroll)
+    #     return rand_cat_name

@@ -70,4 +70,7 @@
         {% endif %}
     {% endif %}
     </form>
+    <p>
+        Do you want to end the game now and see the results? <a href="{{ url_for('gameend', gameid=gameid) }}">Click here</a>
+    </p>
 {% endblock %}
