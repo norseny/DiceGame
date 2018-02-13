@@ -54,23 +54,20 @@
                 {{ form.keep() }}
             </p>
         {% endif %}
-{#                <p>#}
-{#                {{ form.dices }}#}
-{#            </p>#}
-
-{#    {% for subfield in form.dices %}#}
-{#    <tr>#}
-{#        <td>{{ subfield }}</td>#}
-{#        <td>{{ subfield.label }}</td>#}
-{#    </tr>#}
-{#    {% endfor %}#}
         {% if turn < 4%}
         <p>
             {{ form.throw_all() }}
         </p>
         {% endif %}
         {% if turn == 4 %}
-           {{ form.cat_sel() }} {# todo zamienic na keep, po co 2 submity, jak mozna zmienic label#}
+           {{ form.cat_sel() }} {# todo moze zamienic na keep, po co 2 submity, jak moze mozna zmienic label#}
         {% endif %}
+    {% if turn != 1 %}
+        {% if disabled_categories %}
+            <p>
+                The following categories will be disabled in the category choice: {{ disabled_categories }}
+            </p>
+        {% endif %}
+    {% endif %}
     </form>
 {% endblock %}

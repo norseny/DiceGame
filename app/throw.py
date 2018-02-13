@@ -67,7 +67,12 @@ def throw(gameid, playerid):
             elif turn == 3:
                 session['diceroll_3_id'] = diceroll.id
             turn += 1
-            return render_template('throw.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists, cat_results={})
+
+            human_player = HumanPlayer.query.get(int(playerid))
+            disabled_categories = list(human_player.generate_dict_of_part_results(gameid).keys())
+
+            return render_template('throw.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists,
+                                   disabled_categories=disabled_categories)
 
         else:
             computer_player = ComputerPlayer.query.get(int(playerid)) #todo ?...
@@ -88,7 +93,7 @@ def throw(gameid, playerid):
                     session['diceroll_3_id'] = diceroll.id
                 flash('All dices thrown')
                 turn += 1
-                return render_template('computerthrow.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists, cat_results={})
+                return render_template('computerthrow.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists)
 
             elif (choice == 2) and ((turn == 2) or (turn == 3)): # wybór czym rzucić
                 if isinstance(curr_computer_player, ComputerPlayerDummy):
@@ -104,11 +109,13 @@ def throw(gameid, playerid):
                     elif turn == 3:
                         session['diceroll_3_id'] = diceroll.id
                     turn += 1
-                return render_template('computerthrow.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists, cat_results={})
+                return render_template('computerthrow.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists)
 
             elif (choice == 3) or (turn == 4): # wybór kategorii
                 return redirect(url_for('category_blueprint.category', gameid=gameid, playerid=playerid))
     if playerid in game.get_list_of_human_players_ids():
-        return render_template('throw.html', title='Throw', form=form, turn=turn)
+        human_player = HumanPlayer.query.get(int(playerid))
+        disabled_categories = list(human_player.generate_dict_of_part_results(gameid).keys())
+        return render_template('throw.html', title='Throw', form=form, turn=turn, disabled_categories=disabled_categories)
     else:
         return render_template('computerthrow.html', title='Throw', form=form, turn=turn)

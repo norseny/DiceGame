@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, RadioField, FieldList
-from wtforms.validators import DataRequired, ValidationError, EqualTo
-from app.models.game import *
+from wtforms.validators import DataRequired, ValidationError, EqualTo, NumberRange
 from app.models.user import *
+import wtforms.widgets as widgets
 
 
 class LoginForm(FlaskForm):
@@ -25,15 +25,9 @@ class RegistrationForm(FlaskForm):
 
 
 class NewGameForm(FlaskForm):
-    name = StringField('Name')
-    human_players = IntegerField('Human Players')
-    computer_players = IntegerField('Computer Players') #TODO: mozna zostawic puste, ale jesli wypelnione, nie moze przekraczac 10
+    human_players = IntegerField('Human Players', widget = widgets.Input(input_type="number"), validators=[NumberRange(min=1,max=10)])
+    computer_players = IntegerField('Computer Players', widget = widgets.Input(input_type="number"), validators=[NumberRange(max=10)])
     submit = SubmitField('Go to game details')
-
-    def validate_name(self, name):
-        game = Game.query.filter_by(name=name.data).first()
-        if game is not None:
-            raise ValidationError('Please use different name.')
 
 
 class PlayersNamesForm(FlaskForm):
@@ -57,20 +51,9 @@ class ThrowForm(FlaskForm):
 
 
 class SelectCategoryForm(FlaskForm):
-    aces = BooleanField('Aces')
-    twos = BooleanField('Twos')
-    threes = BooleanField('Threes')
-    fours = BooleanField('Fours')
-    fives = BooleanField('Fives')
-    sixes = BooleanField('Sixes')
-    three_of_a_kind = BooleanField('Three of a kind')
-    four_of_a_kind = BooleanField('Four of a kind')
-    full_house = BooleanField('Full house')
-    small_straight = BooleanField('Small straight')
-    large_straight = BooleanField('Large straight')
-    yahtzee = BooleanField('Yahtzee')
-    chance = BooleanField('Chance')
+    choices = RadioField('Categories', choices=[(0, ''),(1, ''), (2, ''),(3, ''), (4, ''),(5, ''), (6, ''),(7, ''), (8, ''),(9, ''), (10, ''),(11, ''), (12, '')], default=0, coerce=int)
 
     submit_the_box = SubmitField('Submit the category')
     submit_next_player = SubmitField('Next player')
+
 

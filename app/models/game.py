@@ -50,7 +50,6 @@ class Game(db.Model):
     # todo: dorobic date
 
     def __init__(self):
-        # self.name = current_user.username + "'s game" + 'id ' + str(self.id)
         insert_to_db(self)
         self.name = current_user.username + "'s game " + 'id ' + str(self.id)
         db.session.commit()

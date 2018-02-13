@@ -1,4 +1,3 @@
-from app.models.game import *
 from app.models.category import *
 from app.models.diceroll import *
 
@@ -6,11 +5,7 @@ from app.models.diceroll import *
 class HumanPlayer(Player):
     pass
 
-
 class ComputerPlayer(Player):
-
-    # def __init__(self, id):
-    #     self.id = id
 
     def dummy(self):
         return True
@@ -40,8 +35,8 @@ class ComputerPlayerDummy(ComputerPlayer):
         return [x+1 for x in ticked_boxes]
 
     def random_selection_of_dices(self):
-        how_many_to_select = random.randint(0, 5)
-        return random.sample(range(0, 5), how_many_to_select)
+        how_many_to_select = random.randint(1, 4)
+        return random.sample(range(1, 5), how_many_to_select)
 
 class ComputerPlayerSmart(ComputerPlayer):
     pass

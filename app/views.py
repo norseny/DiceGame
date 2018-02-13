@@ -4,7 +4,6 @@ from werkzeug.urls import url_parse
 from app import app
 from app.forms import *
 from app.models.user import *
-from app.models.diceroll import *
 from app.models.player import *
 from app.throw import throw_blueprint
 from app.category import category_blueprint
@@ -66,11 +65,9 @@ def newgame():
     form = NewGameForm()
     if form.validate_on_submit():
 
-        # game = Game(name=form.name.data)
         game = Game()
         session['cplayers'] = form.computer_players.data
         session['hplayers'] = form.human_players.data
-        # session['player_no'] = 0
         flash('New game "{}" created'.format(game.name))
 
         return redirect(url_for('playersnames', gameid=game.id))
@@ -83,7 +80,9 @@ def playersnames(gameid):
     form = PlayersNamesForm()
     if form.validate_on_submit():
 
-        human_players = form.players.data[::]
+        human_players = []
+        if form.players.data[0] != '':
+            human_players = form.players.data[:]
         human_players.insert(0, current_user.username)
         for player in human_players:
             human_player = HumanPlayer(player_name=player)

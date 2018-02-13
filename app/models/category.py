@@ -2,25 +2,24 @@ import random
 from app.models.game import *
 
 class Category:
-    names = ['aces',
-             'twos',
-             'threes',
-             'fours',
-             'fives',
-             'sixes',
-             'three_of_a_kind',
-             'four_of_a_kind',
-             'full_house',
-             'small_straight',
-             'large_straight',
-             'yahtzee',
-             'chance'
-             ]
+    category_details = [
+        {'label':'Aces', 'desc1':'Any combination','desc2':'The sum of dice with the number 1', 'result':0},
+        {'label':'Twos', 'desc1':'Any combination','desc2':'The sum of dice with the number 2'},
+        {'label':'Threes','desc1': 'Any combination', 'desc2': 'The sum of dice with the number 3'},
+        {'label': 'Fours', 'desc1': 'Any combination', 'desc2': 'The sum of dice with the number 4'},
+        {'label': 'Fives', 'desc1': 'Any combination', 'desc2': 'The sum of dice with the number 5'},
+        {'label': 'Sixes', 'desc1': 'Any combination', 'desc2': 'The sum of dice with the number 6'},
+        {'label': 'Three of a kind', 'desc1': 'At least three dice the same', 'desc2': 'Sum of all dice'},
+        {'label': 'Four of a kind', 'desc1': 'At least four dice the same', 'desc2': 'Sum of all dice'},
+        {'label': 'Full house', 'desc1': 'Three of one number and two of another', 'desc2': '25'},
+        {'label': 'Small straight', 'desc1': 'Four sequential dice (1-2-3-4, 2-3-4-5, or 3-4-5-6)', 'desc2': '30'},
+        {'label': 'Large straight', 'desc1': 'Five sequential dice (1-2-3-4-5 or 2-3-4-5-6)', 'desc2': '40'},
+        {'label': 'Yahtzee', 'desc1': 'All five dice the same', 'desc2': '50'},
+        {'label': 'Chance', 'desc1': 'Any combination', 'desc2': 'Sum of all dice'},
+    ]
 
     def __init__(self):
         self.result = 0
-
-    # method_list = [method_name for method_name in dir(self) if callable(getattr(self, method_name))]
 
     def aces_count(self, diceroll):
         self.upper_table_count(1, diceroll)
@@ -42,25 +41,38 @@ class Category:
 
     def three_of_a_kind_count(self, diceroll):
         if len(set(diceroll)) <= 3:
-            self.result = sum(diceroll)
+            for dice in diceroll:
+                if diceroll.count(dice) == 3:
+                    self.result = sum(diceroll)
 
     def four_of_a_kind_count(self, diceroll):
-        diceroll_unique = list(set(diceroll)) 
-        if (len(diceroll_unique) < 2 and diceroll.count(diceroll_unique[0]) == 5) or ( len(diceroll_unique) <= 2 and ( (diceroll.count(diceroll_unique[0]) == 4) or (diceroll.count(diceroll_unique[1]) == 4) ) ):
-            self.result = sum(diceroll)
+        if len(set(diceroll)) <= 2:
+            for dice in diceroll:
+                if diceroll.count(dice) == 4:
+                    self.result = sum(diceroll)
 
     def full_house_count(self, diceroll):
         if len(set(diceroll)) == 2:
             self.result = 25
 
-    def small_straight_count(self, diceroll): #todo:
-        if self.is_sublist(list(range(1, 5)), diceroll) or self.is_sublist(list(range(2, 6)), diceroll) or self.is_sublist(list(range(3, 7)), diceroll):
-            n = 7
-            self.result = 30
+    def small_straight_count(self, diceroll):
+        diceroll_set = set(diceroll)
+        list_of_sets = []
+        list_of_sets.append(set(range(1,5)))
+        list_of_sets.append(set(range(2,6)))
+        list_of_sets.append(set(range(3,7)))
+        for my_set in list_of_sets:
+            if self.check_if_subset(diceroll_set, my_set):
+                self.result = 30
 
     def large_straight_count(self, diceroll):
-        if self.is_sublist(list(range(1, 6)), diceroll) or self.is_sublist(list(range(2, 7)), diceroll):
-            self.result = 40
+        diceroll_set = set(diceroll)
+        list_of_sets = []
+        list_of_sets.append(set(range(1, 6)))
+        list_of_sets.append(set(range(2, 7)))
+        for my_set in list_of_sets:
+            if self.check_if_subset(diceroll_set, my_set):
+                self.result = 40
 
     def yahtzee_count(self, diceroll):
         if len(set(diceroll)) == 1:
@@ -74,18 +86,16 @@ class Category:
             if thrown_number == number:
                 self.result += number
 
-    def is_sublist(self, lst1, lst2):
-        ls1 = [element for element in lst1 if element in lst2]
-        ls2 = [element for element in lst2 if element in lst1]
-        ls2 = list(set(ls2))
-        if sorted(ls2) == sorted(ls1):
-            return True
+    def check_if_subset(self, diceroll_set, my_set):
+        return my_set.issubset(diceroll_set)
+
 
     def choose_rand_cat_and_count_result(self, last_diceroll, gameid, playerid):
-        cat_alredy_chosen = True
-        while cat_alredy_chosen:
-            rand_cat_name = self.names[random.randint(0, 12)]
+        cat_already_chosen = True
+        while cat_already_chosen:
+            rand_cat_name = self.category_details[random.randint(0, 12)]['label']
             if not Turn.query.filter_by(game_id=gameid, player_id=playerid, category=rand_cat_name).count():
-                cat_alredy_chosen = False
-        getattr(self, rand_cat_name + '_count')(last_diceroll)
+                cat_already_chosen = False
+                method_name = (rand_cat_name.lower()).replace(' ', '_')
+        getattr(self, method_name + '_count')(last_diceroll)
         return rand_cat_name
