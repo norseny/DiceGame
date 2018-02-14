@@ -4,12 +4,15 @@ from app.forms import *
 from app.models.diceroll import *
 from app.category import category_blueprint
 from app.models.player import *
+from flask_login import login_required
+
 
 app.register_blueprint(category_blueprint)
 
 throw_blueprint = Blueprint('throw_blueprint', __name__)
 
 @throw_blueprint.route('/throw/<int:gameid>/<int:playerid>', methods=['GET', 'POST'])
+@login_required
 def throw(gameid, playerid):
 
     turn = 1

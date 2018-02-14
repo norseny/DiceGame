@@ -4,7 +4,10 @@ nav {
     text-align: right;
     padding: 1em 2em;
     width: 100%;
-    background-color: rgba(130, 173, 255, 0.42);
+    /*background-color: rgba(130, 173, 255, 0.42);*/
+    background-color: #5c415d;
+    color: #fff;
+    /*background-color: #fffc31;*/
 }
 
 nav a {
@@ -12,15 +15,17 @@ nav a {
 }
 
 a {
-    color: #0a1541;
+    color: #fff;
+    /*color: #0a1541;*/
 }
 
 a:hover {
-     color: #0a1541;
+     /*color: #0a1541;*/
+    color: #fffc31;
 }
 
 .container {
-    padding: 2em 3em;
+    padding: 1em 2em;
 }
 
 .content {
@@ -32,8 +37,11 @@ a:hover {
     margin: 0;
     list-style-type: none;
     padding: 10px;
-    background-color: #969ea3;
-    color: #fff;
+    /*background-color: #969ea3;*/
+    /*background-color: #5c415d;*/
+    background-color: #fffc31;
+
+    /*color: #fff;*/
     text-align: center;
 }
 
@@ -49,14 +57,16 @@ h3 {
 input[type='submit'] {
     display: inline-block;
     margin-top: 10px;
-    background-color:  rgba(130, 173, 255, 0.42);
+    /*background-color:  rgba(130, 173, 255, 0.42);*/
+    background-color: #5c415d;
     border-radius: 8px;
     padding: 8px 16px;
     box-shadow: none;
     border: none;
-    transition: .4s ease-in;
+    /*transition: .4s ease-in;*/
     transition-property: background-color;
     letter-spacing: .5px;
+    color: #fff;
 }
 
 input[type='checkbox'] {
@@ -70,7 +80,10 @@ input[type='checkbox'] {
 input[type='submit']:hover,
 input[type='submit']:focus,
 input[type='submit']:active {
-     background-color: #c2b3f9;
+     /*background-color: #c2b3f9;*/
+    background-color: #fffc31;
+    color: #000;
+
 }
 
 .dice {
@@ -93,7 +106,10 @@ input[type='submit']:active {
     border-radius: 4px;
     padding: 3px 4px 6px 8px;
     margin-left: 5px;
-    background-color:  rgba(130, 173, 255, 0.42);
+    /*background-color:  rgba(130, 173, 255, 0.42);*/
+    background-color: #5c415d;
+    color: #fff;
+
 }
 
 .select-dice {
@@ -109,13 +125,15 @@ table, th, td {
     border: 1px solid #0a1541;
 }
 
+table {
+    margin-bottom: 10px;
+}
 tfoot,.foot{
     border: none;
 }
 
 td, th {
     padding: 5px;
-    /*width: 10%;*/
     text-align: center;
 }
 
@@ -125,4 +143,39 @@ thead {
 
 .total {
     text-align: right;
+}
+
+form {
+    margin-bottom: 50px;
+}
+
+.footer {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 1rem;
+    background-color: #fef5ef;
+    text-align: center;
+}
+
+.footer a,
+.click-to-play,
+.click-to-play a{
+    color: #000;
+}
+
+.footer a:hover,
+.click-to-play a:hover{
+    color: #5c415d;
+}
+
+input[type='number'],
+input[type='text']{
+    height: 25px;
+}
+
+.radio label{
+    display: inline;
+    padding-left: 5px;
 }

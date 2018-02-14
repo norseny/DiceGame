@@ -39,6 +39,7 @@ def login():
 
 
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
     session.clear()
@@ -61,6 +62,7 @@ def register():
 
 
 @app.route('/newgame', methods=['GET', 'POST'])
+@login_required
 def newgame():
     form = NewGameForm()
     if form.validate_on_submit():
@@ -75,6 +77,7 @@ def newgame():
 
 
 @app.route('/playersnames/<int:gameid>', methods=['GET', 'POST'])
+@login_required
 def playersnames(gameid):
 
     form = PlayersNamesForm()
@@ -115,6 +118,7 @@ def playersnames(gameid):
 
 
 @app.route('/gameend/<int:gameid>', methods=['GET', 'POST'])
+@login_required
 def gameend(gameid):
 
     gameresult = Gameresult()

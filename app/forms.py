@@ -37,8 +37,8 @@ class PlayersNamesForm(FlaskForm):
     throw = SubmitField('Let the first player throw!')
 
 class ThrowForm(FlaskForm):
-    dice1 = BooleanField('Dice 1',description='Dice 1:') # todo ,default=False) = nie działa, zrobić domyslnie niezaznaczone w kazdej turze
-    dice2 = BooleanField('Dice 2',description='Dice 2:') # todo description niepotrzebne, jest przeciez label
+    dice1 = BooleanField('Dice 1',description='Dice 1:')
+    dice2 = BooleanField('Dice 2',description='Dice 2:')
     dice3 = BooleanField('Dice 3',description='Dice 3:')
     dice4 = BooleanField('Dice 4',description='Dice 4:')
     dice5 = BooleanField('Dice 5',description='Dice 5:')

@@ -9,8 +9,8 @@
     <form action="" method="post">
         {{ form.hidden_tag() }}
         {% if turn > 1 %}
-            <h2>Thrown dices:</h2>
-            <h3>Diceroll 1:</h3>
+{#            <h2>Thrown dices:</h2>#}
+            <h2>Diceroll 1:</h2>
             <p class="dice-result">
                 {% for dice in dices[0] %}
                      <span class="dice">Dice {{loop.index}}:</span> <span class="dice-number-result">{{ dice }}</span>
@@ -18,7 +18,7 @@
             </p>
         {% endif %}
         {% if turn > 2 %}
-            <h3>Diceroll 2:</h3>
+            <h2>Diceroll 2:</h2>
             <p class="dice-result">
                 {% for dice in dices[1] %}
                     <span class="dice">Dice {{loop.index}}:</span> <span class="dice-number-result">{{ dice }}</span>
@@ -26,7 +26,7 @@
             </p>
         {% endif %}
         {% if turn > 3 %}
-            <h3>Diceroll 3:</h3>
+            <h2>Diceroll 3:</h2>
             <p class="dice-result">
                 {% for dice in dices[2] %}
                      <span class="dice">Dice {{loop.index}}:</span> <span class="dice-number-result">{{ dice }}</span>
@@ -70,7 +70,7 @@
         {% endif %}
     {% endif %}
     </form>
-    <p>
+    <div class="footer">
         Do you want to end the game now and see the results? <a href="{{ url_for('gameend', gameid=gameid) }}">Click here</a>
-    </p>
+    </div>
 {% endblock %}

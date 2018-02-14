@@ -3,10 +3,13 @@ from app.forms import *
 from app.models.diceroll import *
 from app.models.category import *
 from app.models.player import *
+from flask_login import login_required
+
 
 category_blueprint = Blueprint('category_blueprint', __name__)
 
 @category_blueprint.route('/category/<int:gameid>/<int:playerid>', methods=['GET','POST'])
+@login_required
 def category(gameid, playerid):
 
     second_dice_id = 0 #todo: optymalizacja

@@ -24,7 +24,7 @@
 </head>
 <body>
     <nav>Dice Game
-        <a href="{{ url_for('index') }}">Home</a> {# todo: niezalogowany uzytkownik moze przejsc gdzie chce, to throw itp #}
+        <a href="{{ url_for('index') }}">Home</a>
         {% if current_user.username %}
             <a href={{ url_for('logout') }}>Logout</a>
         {% else %}
