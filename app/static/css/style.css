@@ -21,7 +21,7 @@ a {
 
 a:hover {
      /*color: #0a1541;*/
-    color: #fffc31;
+    color: #fffc5a;
 }
 
 .container {
@@ -39,7 +39,7 @@ a:hover {
     padding: 10px;
     /*background-color: #969ea3;*/
     /*background-color: #5c415d;*/
-    background-color: #fffc31;
+    background-color: #fffc5a;
 
     /*color: #fff;*/
     text-align: center;
@@ -81,7 +81,7 @@ input[type='submit']:hover,
 input[type='submit']:focus,
 input[type='submit']:active {
      /*background-color: #c2b3f9;*/
-    background-color: #fffc31;
+    background-color: #fffc5a;
     color: #000;
 
 }
