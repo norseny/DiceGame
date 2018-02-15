@@ -3,6 +3,7 @@
 {%  block content %}
     <h1>{{ title }}</h1>
     <table>
+    {% if not suspend %}
         <caption>Here are some results:</caption>
         <thead>
             <tr>
@@ -19,6 +20,9 @@
             {% endfor %}
         </tbody>
     </table>
+    {% else %}
+        <p>...but only for now! You can come back and finish your game later!</p>
+    {% endif %}
 
     <p class="click-to-play">New Game? <a href="{{ url_for('newgame') }}">Click to Play!</a></p>
 

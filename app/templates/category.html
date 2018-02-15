@@ -71,6 +71,12 @@
 
     </form>
     <div class="footer">
-        Do you want to end the game now and see the results? <a href="{{ url_for('gameend', gameid=gameid) }}">Click here</a>
+        Do you want to:
+        <span>
+            <a href="{{ url_for('gameend', game_id=game_id, suspend=0)}}">...end the game now and see the results?</a>
+        </span>
+        <span>
+            <a href="{{ url_for('gameend', game_id=game_id, suspend=1) }}">...suspend the game?</a>
+        </span>
     </div>
 {% endblock %}

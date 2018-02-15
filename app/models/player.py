@@ -5,8 +5,9 @@ import string
 
 
 class HumanPlayer(Player):
-    pass
 
+    def handle_throw_form(self):
+        p = 9
 
 class ComputerPlayer(Player):
 
@@ -38,14 +39,14 @@ class ComputerPlayerDummy(ComputerPlayer):
         how_many_to_select = random.randint(1, 4)
         return random.sample(range(1, 5), how_many_to_select)
 
-    def choose_rand_cat_and_count_result(self, last_diceroll, gameid):
+    def choose_rand_cat_and_count_result(self, last_diceroll, game_id):
         cat = Category()
         picked_category = {}
 
         cat_already_chosen = True
         while cat_already_chosen:
             rand_cat_name = cat.category_details[random.randint(0, 12)]['label']
-            if not Turn.query.filter_by(game_id=gameid, player_id=self.id, category=rand_cat_name).count():
+            if not Turn.query.filter_by(game_id=game_id, player_id=self.id, category=rand_cat_name).count():
                 cat_already_chosen = False
                 method_name = (rand_cat_name.lower()).replace(' ', '_')
 
@@ -57,13 +58,12 @@ class ComputerPlayerDummy(ComputerPlayer):
 
 class ComputerPlayerSmart(ComputerPlayer):
 
-    def choose_cat_and_count_result(self, diceroll, gameid):
+    def choose_cat_and_count_result(self, diceroll, game_id):
         results_dict = self.count_points(diceroll)
         picked_category = {}
         best_category_name = results_dict['best'][1].capitalize().replace('_', ' ').replace('count', '')
         best_category_name = best_category_name.rstrip(string.whitespace)
-        b = 9
-        if not Turn.query.filter_by(game_id=gameid, player_id=self.id, category=best_category_name).count():
+        if not Turn.query.filter_by(game_id=game_id, player_id=self.id, category=best_category_name).count():
             picked_category['name'] = best_category_name.rstrip(string.whitespace)
             picked_category['result'] = results_dict['best'][0]
             return picked_category
@@ -73,19 +73,10 @@ class ComputerPlayerSmart(ComputerPlayer):
             for category in sorted_results:
                 category_name = category[0].capitalize().replace('_', ' ').replace('count', '')
                 category_name = category_name.rstrip(string.whitespace)
-                if not Turn.query.filter_by(game_id=gameid, player_id=self.id, category=category_name).count():
+                if not Turn.query.filter_by(game_id=game_id, player_id=self.id, category=category_name).count():
                     picked_category['name'] = category_name.rstrip(string.whitespace)
                     picked_category['result'] = category[1]
                     return picked_category
-
-
-        # cat_already_chosen = True
-        # while cat_already_chosen:
-        #     if not Turn.query.filter_by(game_id=gameid, player_id=self.id, category=best_category_name).count():
-        #         cat_already_chosen = False
-        # getattr(cat, best_category_method + '_count')(last_diceroll)
-        #
-        # return best_category_name
 
     def count_points(self, diceroll):
             cat = Category()

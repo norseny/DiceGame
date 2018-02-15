@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{%  block content %}
+    <h1>{{ title }}</h1>
+        {{ player_name }}, here are your suspended games:
+            {% for key, value in games.items() %}
+                <p>
+                    {{ key }}
+                    {{ value }}
+                </p>
+            {% endfor %}
+
+    <p class="click-to-play">New Game? <a href="{{ url_for('newgame') }}">Click to Play!</a></p>
+
+{% endblock %}

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{%  block content %}
+{% block content %}
     {% if turn < 4 %}
         <h1>Throw the dices</h1>
     {% elif turn == 4 %}
@@ -9,11 +9,10 @@
     <form action="" method="post">
         {{ form.hidden_tag() }}
         {% if turn > 1 %}
-{#            <h2>Thrown dices:</h2>#}
             <h2>Diceroll 1:</h2>
             <p class="dice-result">
                 {% for dice in dices[0] %}
-                     <span class="dice">Dice {{loop.index}}:</span> <span class="dice-number-result">{{ dice }}</span>
+                    <span class="dice">Dice {{ loop.index }}:</span> <span class="dice-number-result">{{ dice }}</span>
                 {% endfor %}
             </p>
         {% endif %}
@@ -21,7 +20,7 @@
             <h2>Diceroll 2:</h2>
             <p class="dice-result">
                 {% for dice in dices[1] %}
-                    <span class="dice">Dice {{loop.index}}:</span> <span class="dice-number-result">{{ dice }}</span>
+                    <span class="dice">Dice {{ loop.index }}:</span> <span class="dice-number-result">{{ dice }}</span>
                 {% endfor %}
             </p>
         {% endif %}
@@ -29,11 +28,11 @@
             <h2>Diceroll 3:</h2>
             <p class="dice-result">
                 {% for dice in dices[2] %}
-                     <span class="dice">Dice {{loop.index}}:</span> <span class="dice-number-result">{{ dice }}</span>
+                    <span class="dice">Dice {{ loop.index }}:</span> <span class="dice-number-result">{{ dice }}</span>
                 {% endfor %}
             </p>
         {% endif %}
-        {% if turn != 1 and turn < 4%}
+        {% if turn != 1 and turn < 4 %}
             <p class="select-dice">
                 Select the dices you want to throw again:
             </p>
@@ -54,23 +53,29 @@
                 {{ form.keep() }}
             </p>
         {% endif %}
-        {% if turn < 4%}
-        <p>
-            {{ form.throw_all() }}
-        </p>
-        {% endif %}
-        {% if turn == 4 %}
-           {{ form.cat_sel() }} {# todo moze zamienic na keep, po co 2 submity, jak moze mozna zmienic label#}
-        {% endif %}
-    {% if turn != 1 %}
-        {% if disabled_categories %}
+        {% if turn < 4 %}
             <p>
-                The following categories will be disabled in the category choice: {{ disabled_categories }}
+                {{ form.throw_all() }}
             </p>
         {% endif %}
-    {% endif %}
+        {% if turn == 4 %}
+            {{ form.cat_sel() }} {# todo moze zamienic na keep, po co 2 submity, jak moze mozna zmienic label#}
+        {% endif %}
+        {% if turn != 1 %}
+            {% if disabled_categories %}
+                <p>
+                    The following categories will be disabled in the category choice: {{ disabled_categories }}
+                </p>
+            {% endif %}
+        {% endif %}
     </form>
     <div class="footer">
-        Do you want to end the game now and see the results? <a href="{{ url_for('gameend', gameid=gameid) }}">Click here</a>
+        Do you want to:
+        <span>
+            <a href="{{ url_for('gameend', game_id=game_id, suspend=0)}}">...end the game now and see the results?</a>
+        </span>
+        <span>
+            <a href="{{ url_for('gameend', game_id=game_id, suspend=1) }}">...suspend the game?</a>
+        </span>
     </div>
 {% endblock %}

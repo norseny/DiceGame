@@ -5,6 +5,7 @@ from app import app
 from app.forms import *
 from app.models.user import *
 from app.models.player import *
+from app.models.game import *
 from app.throw import throw_blueprint
 from app.category import category_blueprint
 
@@ -72,13 +73,13 @@ def newgame():
         session['hplayers'] = form.human_players.data
         flash('New game "{}" created'.format(game.name))
 
-        return redirect(url_for('playersnames', gameid=game.id))
+        return redirect(url_for('playersnames', game_id=game.id))
     return render_template('newgame.html', title='New Game', form=form)
 
 
-@app.route('/playersnames/<int:gameid>', methods=['GET', 'POST'])
+@app.route('/playersnames/<int:game_id>', methods=['GET', 'POST'])
 @login_required
-def playersnames(gameid):
+def playersnames(game_id):
 
     form = PlayersNamesForm()
     if form.validate_on_submit():
@@ -89,15 +90,15 @@ def playersnames(gameid):
         human_players.insert(0, current_user.username)
         for player in human_players:
             human_player = HumanPlayer(player_name=player)
-            human_player.insert_player_to_db(gameid)
+            human_player.insert_player_to_db(game_id)
 
-        game = Game.query.get(gameid)
+        game = Game.query.get(game_id)
 
         human_players_ids = game.get_list_of_human_players_ids()
 
         if session.get('cplayers'):
             computer_player = ComputerPlayer()
-            computer_player.create_cplayers(gameid, session['cplayers'], form.computer_ai.data)
+            computer_player.create_cplayers(game_id, session['cplayers'], form.computer_ai.data)
             session.pop('cplayers', None)
 
         session.pop('diceroll_1_id', None)
@@ -106,7 +107,7 @@ def playersnames(gameid):
 
         flash('Players created. The current player is: {}'.format(human_players[0]))
 
-        return redirect(url_for('throw_blueprint.throw', gameid=gameid ,playerid=human_players_ids[0]))
+        return redirect(url_for('throw_blueprint.throw', game_id=game_id ,playerid=human_players_ids[0]))
 
     if session.get('hplayers'):
         form.players.entries[0] = current_user.username
@@ -117,21 +118,39 @@ def playersnames(gameid):
     return render_template('playersnames.html', title='Players Names', form=form)
 
 
-@app.route('/gameend/<int:gameid>', methods=['GET', 'POST'])
+@app.route('/gameend/<int:game_id>/<int:suspend>', methods=['GET', 'POST'])
 @login_required
-def gameend(gameid):
+def gameend(game_id, suspend=False): #todo poprawic na game_end
 
-    gameresult = Gameresult()
-    gameresult.update_results(gameid)
-    gameresults_all = Gameresult.query.filter_by(game_id=gameid).all()
     gameresults_dict = {}
+    if not suspend:
+        gameresult = Gameresult()
+        gameresult.update_results(game_id)
+        gameresults_all = Gameresult.query.filter_by(game_id=game_id).all()
+        game = Game.query.get(game_id)
+        game.finished = True
+        db.commit()
 
-    for el in gameresults_all:
-        if isinstance(el, Gameresult):
-            player = Player.query.get(int(el.player_id))
-            gameresults_dict[player.player_name] = el.result
+        for el in gameresults_all:
+            if isinstance(el, Gameresult):
+                player = Player.query.get(int(el.player_id))
+                gameresults_dict[player.player_name] = el.result
 
-    return render_template('gameend.html', title='End of the game', gameresults_dict=gameresults_dict)
+    return render_template('gameend.html', title='End of the game', gameresults_dict=gameresults_dict, suspend=suspend)
+
+@app.route('/suspended_games', methods=['GET', 'POST'])
+@login_required
+def suspended_games():
+    human_player = Player.query.filter_by(user_id=current_user.id).first()
+    turns = Turn.query.with_entities(Turn.game_id).filter_by(player_id=human_player.id).all()
+    games = {}
+    for el in turns:
+        if el.game_id:
+            games[el.game_id] = Game.query.with_entities(Game.name, Game.date).filter_by(id=el.game_id).first()
+    return render_template('suspended_games.html', title='End of the game', player_name=human_player.player_name,
+                           games=games)
+
+
 
 
 # @app.route('/process', methods=['POST'])

@@ -61,10 +61,31 @@ class Diceroll(db.Model):
 
     def throw_all_rand(self):
         self.generate_all_rand_dices_and_insert_to_db()
-        # if 'diceroll_1_id' not in session: #todo: sprawdzic czy na pewno nie moze tu byc
-        #     session['diceroll_1_id'] = self.id
-        # elif 'diceroll_2_id' not in session:
-        #     session['diceroll_2_id'] = self.id
-        # else:
-        #     session['diceroll_3_id'] = self.id
         return self.return_dices_as_list()
+
+# def get_dicerolls_data():
+#     dicerolls_data = {}
+#     dicerolls_data['second_dice_id'] = 0 # todo: dokończyć
+#     dicerolls_data['third_dice_id'] = 0
+#
+#     if session.get('diceroll_3_id'):
+#         third_dice_obj = dicerolls_data['last_dice_obj'] = Diceroll.query.get(session['diceroll_3_id'])
+#         dicerolls_data['third_dice_id'] = third_dice_obj.id
+#         session.get('diceroll_2_id')
+#         second_dice = Diceroll.query.get(session['diceroll_2_id'])
+#         dicerolls_data['second_dice_id'] = second_dice.id
+#         session.get('diceroll_1_id')
+#         first_dice = Diceroll.query.get(session['diceroll_1_id'])
+#         dicerolls_data['first_dice_id'] = first_dice.id
+#
+#     elif session.get('diceroll_2_id'):
+#         second_dice = last_dice = Diceroll.query.get(session['diceroll_2_id'])
+#         dicerolls_data['second_dice_id'] = second_dice.id
+#         session.get('diceroll_1_id')
+#         first_dice = Diceroll.query.get(session['diceroll_1_id'])
+#         dicerolls_data['first_dice_id'] = first_dice.id
+#
+#     elif session.get('diceroll_1_id'):
+#         first_dice = dicerolls_data['last_dice_obj'] = Diceroll.query.get(session['diceroll_1_id'])
+#         dicerolls_data['first_dice_id'] = first_dice.id
+

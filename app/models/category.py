@@ -103,14 +103,3 @@ class Category:
 
     def check_if_subset(self, diceroll_set, my_set):
         return my_set.issubset(diceroll_set)
-
-
-    # def choose_rand_cat_and_count_result(self, last_diceroll, gameid, playerid):
-    #     cat_already_chosen = True
-    #     while cat_already_chosen:
-    #         rand_cat_name = self.category_details[random.randint(0, 12)]['label']
-    #         if not Turn.query.filter_by(game_id=gameid, player_id=playerid, category=rand_cat_name).count():
-    #             cat_already_chosen = False
-    #             method_name = (rand_cat_name.lower()).replace(' ', '_')
-    #     getattr(self, method_name + '_count')(last_diceroll)
-    #     return rand_cat_name
