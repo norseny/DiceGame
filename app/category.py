@@ -11,30 +11,57 @@ category_blueprint = Blueprint('category_blueprint', __name__)
 @category_blueprint.route('/category/<int:game_id>/<int:player_id>', methods=['GET', 'POST'])
 @login_required
 def category(game_id, player_id):
-    
-    # dicerolls_data = get_dicerolls_data() #todo: dokonczyc
+
+    player = Player.query.get(player_id)
+    dicerolls_objects_list = player.find_unassigned_dicerolls(game_id)
+    dicerolls_ids = []
+
+    for diceroll_obj in dicerolls_objects_list:
+        dicerolls_ids.append(diceroll_obj.id)
+
+    if dicerolls_ids:
+        last_diceroll_obj = Diceroll.query.get(dicerolls_ids[len(dicerolls_ids)-1])
+        last_diceroll = last_diceroll_obj.return_dices_as_list()
+    else:
+        last_diceroll_obj = Diceroll.query.filter_by(game_id=game_id, player_id=player_id).order_by(Diceroll.id.desc()).first()
+        last_diceroll = last_diceroll_obj.id
+
     dicerolls_data = {}
+    dicerolls_data['first_dice_id'] = 0
     dicerolls_data['second_dice_id'] = 0
     dicerolls_data['third_dice_id'] = 0
-    if session.get('diceroll_3_id'):
-        third_dice = last_dice = Diceroll.query.get(session['diceroll_3_id'])
-        dicerolls_data['third_dice_id'] = third_dice.id
-        session.get('diceroll_2_id')
-        second_dice = Diceroll.query.get(session['diceroll_2_id'])
-        dicerolls_data['second_dice_id'] = second_dice.id
-        session.get('diceroll_1_id')
-        first_dice = Diceroll.query.get(session['diceroll_1_id'])
-        dicerolls_data['first_dice_id'] = first_dice.id
-    elif session.get('diceroll_2_id'):
-        second_dice = last_dice = Diceroll.query.get(session['diceroll_2_id'])
-        dicerolls_data['second_dice_id'] = second_dice.id
-        session.get('diceroll_1_id')
-        first_dice = Diceroll.query.get(session['diceroll_1_id'])
-        dicerolls_data['first_dice_id'] = first_dice.id
-    elif session.get('diceroll_1_id'):
-        first_dice = last_dice = Diceroll.query.get(session['diceroll_1_id'])
-        dicerolls_data['first_dice_id'] = first_dice.id
-    last_diceroll = last_dice.return_dices_as_list()
+
+    if len(dicerolls_ids) >=1 :
+        dicerolls_data['first_dice_id'] = dicerolls_ids[0]
+        if len(dicerolls_ids) >=2:
+            dicerolls_data['second_dice_id'] = dicerolls_ids[1]
+            if len(dicerolls_ids) ==3:
+                dicerolls_data['third_dice_id'] = dicerolls_ids[2]
+
+
+    # dicerolls_data = get_dicerolls_data() #todo: dokonczyc
+    # dicerolls_data = {}
+    # dicerolls_data['second_dice_id'] = 0
+    # dicerolls_data['third_dice_id'] = 0
+    # if session.get('diceroll_3_id'):
+    #     third_dice = last_dice = Diceroll.query.get(session['diceroll_3_id'])
+    #     dicerolls_data['third_dice_id'] = third_dice.id
+    #     session.get('diceroll_2_id')
+    #     second_dice = Diceroll.query.get(session['diceroll_2_id'])
+    #     dicerolls_data['second_dice_id'] = second_dice.id
+    #     session.get('diceroll_1_id')
+    #     first_dice = Diceroll.query.get(session['diceroll_1_id'])
+    #     dicerolls_data['first_dice_id'] = first_dice.id
+    # elif session.get('diceroll_2_id'):
+    #     second_dice = last_dice = Diceroll.query.get(session['diceroll_2_id'])
+    #     dicerolls_data['second_dice_id'] = second_dice.id
+    #     session.get('diceroll_1_id')
+    #     first_dice = Diceroll.query.get(session['diceroll_1_id'])
+    #     dicerolls_data['first_dice_id'] = first_dice.id
+    # elif session.get('diceroll_1_id'):
+    #     first_dice = last_dice = Diceroll.query.get(session['diceroll_1_id'])
+    #     dicerolls_data['first_dice_id'] = first_dice.id
+    # last_diceroll = last_dice.return_dices_as_list()
 
     form = SelectCategoryForm()
     hide_checkboxes = False

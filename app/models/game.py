@@ -47,6 +47,7 @@ class Player(db.Model):
         insert_to_db(game_result)
 
     def remove_unassigned_dicerolls(self, game_id):
+
         player_dicerolls = Diceroll.query.filter_by(game_id=game_id, player_id=self.id).all()
         player_turn_dicerolls = Turn.query.filter_by(game_id=game_id, player_id=self.id).add_columns(
             Turn.diceroll1_id, Turn.diceroll2_id, Turn.diceroll3_id).all()
@@ -62,6 +63,28 @@ class Player(db.Model):
                 diceroll_to_remove = Diceroll.query.get(diceroll.id)
                 db.session.delete(diceroll_to_remove)
                 db.session.commit()
+
+    def find_unassigned_dicerolls(self, game_id):
+        found_dicerolls = []
+
+        player_dicerolls = Diceroll.query.filter_by(game_id=game_id, player_id=self.id).all()
+        player_turn_dicerolls = Turn.query.filter_by(game_id=game_id, player_id=self.id).add_columns(
+            Turn.diceroll1_id, Turn.diceroll2_id, Turn.diceroll3_id).all()
+
+        player_turn_dicerolls_ids = []
+        for el in player_turn_dicerolls:
+            player_turn_dicerolls_ids.append(el.diceroll1_id)
+            player_turn_dicerolls_ids.append(el.diceroll2_id)
+            player_turn_dicerolls_ids.append(el.diceroll3_id)
+
+        for index, diceroll in enumerate(player_dicerolls):
+            if diceroll.id not in player_turn_dicerolls_ids:
+                found_dicerolls.append(Diceroll.query.get(diceroll.id))
+
+        return found_dicerolls
+                # db.session.delete(diceroll_to_remove)
+                # db.session.commit()
+
 
 
 class Game(db.Model):

@@ -68,7 +68,6 @@ def newgame():
     form = NewGameForm()
     if form.validate_on_submit():
         game = Game()
-        # session['cplayers'] = form.computer_players.data
         session['hplayers'] = form.human_players.data
         flash('New game "{}" created'.format(game.name))
 
@@ -98,11 +97,6 @@ def playersnames(game_id, cplayers_no):
 
         computer_player = ComputerPlayer()
         computer_player.create_cplayers(game_id, cplayers_no, form.computer_ai.data)
-
-        session.pop('diceroll_1_id', None)
-        session.pop('diceroll_2_id', None)
-        session.pop('diceroll_3_id', None)  # todo: lepiej przechowac to w liscie session['game_data'],
-        # a w ogole zmienic na query z bazy
 
         flash('Players created. The current player is: {}'.format(current_user.username))
 
@@ -156,11 +150,6 @@ def suspended_games():
             query = Turn.query.filter_by(game_id=el, player_id=human_player.id)
             games[el].append(query.count())
             games[el].append(query.with_entities(func.sum(Turn.part_result)).scalar())
-
-        # temp
-        session.pop('diceroll_1_id', None)
-        session.pop('diceroll_2_id', None)
-        session.pop('diceroll_3_id', None)
 
     return render_template('suspended_games.html', title='Suspended games',
                            games=games, isinstance=isinstance, datetime=datetime, human_player=human_player)

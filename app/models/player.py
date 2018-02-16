@@ -5,9 +5,7 @@ import string
 
 
 class HumanPlayer(Player):
-
-    def handle_throw_form(self):
-        p = 9
+    pass
 
 class ComputerPlayer(Player):
 
