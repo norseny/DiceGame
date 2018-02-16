@@ -143,7 +143,8 @@ def suspended_games():
         player_unfinished_games = dict(Gameresult.query.filter_by(player_id=human_player.id, result=None).add_columns(Gameresult.game_id).all())
 
         for game_id in player_unfinished_games.values():
-            human_player.remove_unassigned_dicerolls(game_id)
+            unassingned_dicerolls_list = human_player.find_unassigned_dicerolls(game_id)
+            human_player.remove_unassigned_dicerolls(unassingned_dicerolls_list)
 
         for el in player_unfinished_games.values():
             games[el] = list(Game.query.with_entities(Game.name, Game.date).filter_by(id=el).first())
