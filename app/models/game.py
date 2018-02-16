@@ -2,13 +2,14 @@ from app import db
 from sqlalchemy import func
 from flask_login import current_user
 from datetime import datetime
+from app.models.diceroll import *
 
 
 class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     player_name = db.Column(db.String(64))
     computer_player = db.Column(db.Boolean, default=False)
-    user_id = db.Column(db.Integer, unique=True) #todo jak tworzy sie zalogowany to ma nadac id usera
+    user_id = db.Column(db.Integer, unique=True)
 
     def __repr__(self):
         return '<Player {}>'.format(self.player_name)
@@ -32,7 +33,9 @@ class Player(db.Model):
     def get_no_of_turns(self, game_id):
         return Turn.query.filter_by(game_id=game_id, player_id=self.id).count()
 
-    def insert_player_to_db(self, game_id):
+    def insert_player_to_db(self, game_id, user=False):
+        if user:
+            self.user_id = current_user.id
         existing_player = Player.query.filter_by(player_name=self.player_name).first()
         if existing_player is None:
             insert_to_db(self)
@@ -43,16 +46,32 @@ class Player(db.Model):
         game_result = Gameresult(game_id=game_id, player_id=id_to_db)
         insert_to_db(game_result)
 
+    def remove_unassigned_dicerolls(self, game_id):
+        player_dicerolls = Diceroll.query.filter_by(game_id=game_id, player_id=self.id).all()
+        player_turn_dicerolls = Turn.query.filter_by(game_id=game_id, player_id=self.id).add_columns(
+            Turn.diceroll1_id, Turn.diceroll2_id, Turn.diceroll3_id).all()
+
+        player_turn_dicerolls_ids = []
+        for el in player_turn_dicerolls:
+            player_turn_dicerolls_ids.append(el.diceroll1_id)
+            player_turn_dicerolls_ids.append(el.diceroll2_id)
+            player_turn_dicerolls_ids.append(el.diceroll3_id)
+
+        for diceroll in player_dicerolls:
+            if diceroll.id not in player_turn_dicerolls_ids:
+                diceroll_to_remove = Diceroll.query.get(diceroll.id)
+                db.session.delete(diceroll_to_remove)
+                db.session.commit()
+
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
     date = db.Column(db.DateTime, default=datetime.now())
-    finished = db.Column(db.Boolean, default=False)
 
     def __init__(self):
         insert_to_db(self)
-        self.name = current_user.username + "'s game " + 'id ' + str(self.id)
+        self.name = current_user.username + "'s game " + 'id ' + str(self.id) #todo: poprawic na wprowadzanie nazwy gry
         db.session.commit()
 
     def __repr__(self):

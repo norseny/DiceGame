@@ -2,9 +2,9 @@
 
 {% block content %}
     {% if turn < 4 %}
-        <h1>Throw the dices</h1>
+        <h1>Throw the dice</h1>
     {% elif turn == 4 %}
-        <h1>All the dices</h1>
+        <h1>All the dice</h1>
     {% endif %}
     <form action="" method="post">
         {{ form.hidden_tag() }}
@@ -34,7 +34,7 @@
         {% endif %}
         {% if turn != 1 and turn < 4 %}
             <p class="select-dice">
-                Select the dices you want to throw again:
+                Select the dice you want to throw again:
             </p>
             <p>
                 <span class="dice-choose">{{ form.dice1.description }}{{ form.dice1 }}</span>

@@ -12,12 +12,14 @@
                 </p>
             {% endfor %}
         </p>
+    {% if cplayers_no %}
         <p>
-            <h2>Computer Players Level</h2>
+            <h2>Computer Players Level</h2> {# todo: nie powinno sie wyswietlac gdy com pl = 0 #}
             {% for subfield in form.computer_ai %}
                <span class="radio"> {{ subfield }} {{ subfield.label }} </span>
             {% endfor %}
         </p>
+    {% endif %}
         <p>
             {{ form.throw() }}
         </p>

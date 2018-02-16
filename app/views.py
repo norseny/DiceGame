@@ -8,7 +8,7 @@ from app.models.player import *
 from app.models.game import *
 from app.throw import throw_blueprint
 from app.category import category_blueprint
-
+from datetime import datetime
 
 app.register_blueprint(throw_blueprint)
 app.register_blueprint(category_blueprint)
@@ -67,60 +67,60 @@ def register():
 def newgame():
     form = NewGameForm()
     if form.validate_on_submit():
-
         game = Game()
-        session['cplayers'] = form.computer_players.data
+        # session['cplayers'] = form.computer_players.data
         session['hplayers'] = form.human_players.data
         flash('New game "{}" created'.format(game.name))
 
-        return redirect(url_for('playersnames', game_id=game.id))
+        return redirect(url_for('playersnames', game_id=game.id, cplayers_no=form.computer_players.data))
     return render_template('newgame.html', title='New Game', form=form)
 
 
-@app.route('/playersnames/<int:game_id>', methods=['GET', 'POST'])
+@app.route('/playersnames/<int:game_id>/<int:cplayers_no>', methods=['GET', 'POST'])
 @login_required
-def playersnames(game_id):
-
+def playersnames(game_id, cplayers_no):
     form = PlayersNamesForm()
     if form.validate_on_submit():
 
         human_players = []
         if form.players.data[0] != '':
             human_players = form.players.data[:]
-        human_players.insert(0, current_user.username)
+
+        human_player = HumanPlayer(player_name=current_user.username)
+        human_player.insert_player_to_db(game_id, True)
+
         for player in human_players:
             human_player = HumanPlayer(player_name=player)
             human_player.insert_player_to_db(game_id)
 
         game = Game.query.get(game_id)
-
         human_players_ids = game.get_list_of_human_players_ids()
 
-        if session.get('cplayers'):
-            computer_player = ComputerPlayer()
-            computer_player.create_cplayers(game_id, session['cplayers'], form.computer_ai.data)
-            session.pop('cplayers', None)
+        computer_player = ComputerPlayer()
+        computer_player.create_cplayers(game_id, cplayers_no, form.computer_ai.data)
 
         session.pop('diceroll_1_id', None)
         session.pop('diceroll_2_id', None)
-        session.pop('diceroll_3_id', None) # todo: lepiej przechowac to w liscie session['game_data']
+        session.pop('diceroll_3_id', None)  # todo: lepiej przechowac to w liscie session['game_data'],
+        # a w ogole zmienic na query z bazy
 
-        flash('Players created. The current player is: {}'.format(human_players[0]))
+        flash('Players created. The current player is: {}'.format(current_user.username))
 
-        return redirect(url_for('throw_blueprint.throw', game_id=game_id ,playerid=human_players_ids[0]))
+        return redirect(url_for('throw_blueprint.throw', game_id=game_id, player_id=human_players_ids[0]))
 
+    # init the form with name of the user as the first player
     if session.get('hplayers'):
         form.players.entries[0] = current_user.username
         for i in range(1, session['hplayers']):
             form.players.append_entry()
         session.pop('hplayers', None)
 
-    return render_template('playersnames.html', title='Players Names', form=form)
+    return render_template('playersnames.html', title='Players Names', form=form, cplayers_no=cplayers_no)
 
 
 @app.route('/gameend/<int:game_id>/<int:suspend>', methods=['GET', 'POST'])
 @login_required
-def gameend(game_id, suspend=False): #todo poprawic na game_end
+def gameend(game_id, suspend=False):  # todo poprawic na game_end
 
     gameresults_dict = {}
     if not suspend:
@@ -129,7 +129,7 @@ def gameend(game_id, suspend=False): #todo poprawic na game_end
         gameresults_all = Gameresult.query.filter_by(game_id=game_id).all()
         game = Game.query.get(game_id)
         game.finished = True
-        db.commit()
+        db.session.commit()
 
         for el in gameresults_all:
             if isinstance(el, Gameresult):
@@ -138,20 +138,32 @@ def gameend(game_id, suspend=False): #todo poprawic na game_end
 
     return render_template('gameend.html', title='End of the game', gameresults_dict=gameresults_dict, suspend=suspend)
 
+
 @app.route('/suspended_games', methods=['GET', 'POST'])
 @login_required
 def suspended_games():
-    human_player = Player.query.filter_by(user_id=current_user.id).first()
-    turns = Turn.query.with_entities(Turn.game_id).filter_by(player_id=human_player.id).all()
+
     games = {}
-    for el in turns:
-        if el.game_id:
-            games[el.game_id] = Game.query.with_entities(Game.name, Game.date).filter_by(id=el.game_id).first()
-    return render_template('suspended_games.html', title='End of the game', player_name=human_player.player_name,
-                           games=games)
+    human_player = Player.query.filter_by(user_id=current_user.id).first()
+    if human_player != None:
+        player_unfinished_games = dict(Gameresult.query.filter_by(player_id=human_player.id, result=None).add_columns(Gameresult.game_id).all())
 
+        for game_id in player_unfinished_games.values():
+            human_player.remove_unassigned_dicerolls(game_id)
 
+        for el in player_unfinished_games.values():
+            games[el] = list(Game.query.with_entities(Game.name, Game.date).filter_by(id=el).first())
+            query = Turn.query.filter_by(game_id=el, player_id=human_player.id)
+            games[el].append(query.count())
+            games[el].append(query.with_entities(func.sum(Turn.part_result)).scalar())
 
+        # temp
+        session.pop('diceroll_1_id', None)
+        session.pop('diceroll_2_id', None)
+        session.pop('diceroll_3_id', None)
+
+    return render_template('suspended_games.html', title='Suspended games',
+                           games=games, isinstance=isinstance, datetime=datetime, human_player=human_player)
 
 # @app.route('/process', methods=['POST'])
 # def process():

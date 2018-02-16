@@ -22,6 +22,7 @@
     </table>
     {% else %}
         <p>...but only for now! You can come back and finish your game later!</p>
+        <p><a href="{{ url_for('suspended_games') }}">Your suspended games</a></p>
     {% endif %}
 
     <p class="click-to-play">New Game? <a href="{{ url_for('newgame') }}">Click to Play!</a></p>

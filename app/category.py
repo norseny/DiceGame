@@ -8,9 +8,9 @@ from flask_login import login_required
 category_blueprint = Blueprint('category_blueprint', __name__)
 
 
-@category_blueprint.route('/category/<int:game_id>/<int:playerid>', methods=['GET', 'POST'])
+@category_blueprint.route('/category/<int:game_id>/<int:player_id>', methods=['GET', 'POST'])
 @login_required
-def category(game_id, playerid):
+def category(game_id, player_id):
     
     # dicerolls_data = get_dicerolls_data() #todo: dokonczyc
     dicerolls_data = {}
@@ -39,7 +39,7 @@ def category(game_id, playerid):
     form = SelectCategoryForm()
     hide_checkboxes = False
     game = Game.query.get(game_id)
-    player = Player.query.get(playerid)
+    player = Player.query.get(player_id)
     comp = []
 
     cat_results = player.generate_dict_of_part_results(game_id)
@@ -58,9 +58,9 @@ def category(game_id, playerid):
             total += radio.result
 
     if not form.submit_next_player.data:  # todo: moze rozwiazac tego ifa inaczej
-        if playerid not in game.get_list_of_human_players_ids():
+        if player_id not in game.get_list_of_human_players_ids():
 
-            computer_player = ComputerPlayer.query.get(int(playerid))
+            computer_player = ComputerPlayer.query.get(int(player_id))
             curr_computer_player = computer_player.check_ai_and_return_object()
 
             if isinstance(curr_computer_player, ComputerPlayerDummy):
@@ -103,23 +103,23 @@ def category(game_id, playerid):
 
             game = Game.query.get(int(game_id))
             players = game.get_list_of_all_players_ids()
-            curr_player_pos = players.index(playerid)
+            curr_player_pos = players.index(player_id)
 
             if curr_player_pos != len(players) - 1:
-                playerid = players[int(curr_player_pos + 1)]
+                player_id = players[int(curr_player_pos + 1)]
             else:
                 if 13 == player.get_no_of_turns(game_id):
-                    return redirect(url_for('gameend', game_id=game_id))
+                    return redirect(url_for('gameend', game_id=game_id, suspend=False))
                 else:
-                    playerid = players[0]
+                    player_id = players[0]
 
             session.pop('diceroll_1_id', None)
             session.pop('diceroll_2_id', None)
             session.pop('diceroll_3_id', None)
 
-            player_name = db.session.query(Player.player_name).filter(Player.id == playerid).scalar()
+            player_name = db.session.query(Player.player_name).filter(Player.id == player_id).scalar()
             flash('The current player is: {}'.format(player_name))
-            return redirect(url_for('throw_blueprint.throw', game_id=game_id, playerid=playerid))
+            return redirect(url_for('throw_blueprint.throw', game_id=game_id, player_id=player_id))
 
     return render_template('category.html', title='Category Selection', form=form, hide_checkboxes=hide_checkboxes,
                            player_name=player.player_name, last_diceroll=last_diceroll, total=total, computer=comp,

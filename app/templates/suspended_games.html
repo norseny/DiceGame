@@ -2,13 +2,42 @@
 
 {%  block content %}
     <h1>{{ title }}</h1>
-        {{ player_name }}, here are your suspended games:
-            {% for key, value in games.items() %}
-                <p>
-                    {{ key }}
-                    {{ value }}
-                </p>
-            {% endfor %}
+        {% if human_player == None %}
+            <p>No games found</p>
+        {% elif games %}
+            <table>
+                <caption>{{ human_player.player_name }}, here are your suspended games:</caption>
+                <thead>
+                    <tr>
+                        <th>Game name</th> {# todo: dodac players no (comp, human) #}
+                        <th>Created</th>
+                        <th>Turns played</th>
+                        <th>Your result</th>
+                        <th>Play!</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for key,value in games.items() %}
+                    <tr>
+                    {% for el in value %}
+                        {% if isinstance(el, datetime) %}
+                            <td>{{ el.strftime('%d.%m.%Y %H:%M') }}</td>
+                        {% elif el == None %}
+                            <td>0</td>
+                        {% else %}
+                            <td>{{ el }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    <td>
+                        <a href="{{ url_for('throw_blueprint.throw', game_id=key, player_id=human_player.id)}}">Continue</a>
+                    </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            All your games are finished.
+        {% endif %}
 
     <p class="click-to-play">New Game? <a href="{{ url_for('newgame') }}">Click to Play!</a></p>
 

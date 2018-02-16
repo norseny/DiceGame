@@ -32,9 +32,9 @@ class NewGameForm(FlaskForm):
 
 class PlayersNamesForm(FlaskForm):
     players = FieldList(StringField('Name'), min_entries=1, max_entries=10)
-
     computer_ai = RadioField('Computer Players Level', choices=[('Dummy', 'Dummy computers'), ('Smart', 'Smart Computers')], default='Dummy')
     throw = SubmitField('Let the first player throw!')
+
 
 class ThrowForm(FlaskForm):
     dice1 = BooleanField('Dice 1',description='Dice 1:')
@@ -43,9 +43,9 @@ class ThrowForm(FlaskForm):
     dice4 = BooleanField('Dice 4',description='Dice 4:')
     dice5 = BooleanField('Dice 5',description='Dice 5:')
 
-    throw_sel = SubmitField('Throw selected dices again',)
-    throw_all = SubmitField('Throw all 5 dices')
-    keep = SubmitField('Keep all the dices and select the category')
+    throw_sel = SubmitField('Throw selected dice again',)
+    throw_all = SubmitField('Throw all 5 dice')
+    keep = SubmitField('Keep all the dice and select the category')
     cat_sel = SubmitField('Go to category selection')
     comp_next_step = SubmitField("Show me computer's next step")
 
