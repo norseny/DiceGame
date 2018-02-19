@@ -51,6 +51,7 @@ class ThrowForm(FlaskForm):
     keep = SubmitField('Keep all the dice and select the category')
     cat_sel = SubmitField('Go to category selection')
     comp_next_step = SubmitField("Show me computer's next step")
+    show_my_results = 
 
 
 class SelectCategoryForm(FlaskForm):

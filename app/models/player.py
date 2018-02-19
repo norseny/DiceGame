@@ -62,23 +62,38 @@ class ComputerPlayerDummy(ComputerPlayer):
         for key in zero_results_dict.keys():
             del results_dict[key]
 
-        sorted_results = sorted(results_dict.items(), key=lambda x: x[1])
+        method_name = ''
+
+        # lower graded categories first (but all higher than 0)
+        # if results_dict:
+        #     sorted_results = sorted(results_dict.items(), key=lambda x: x[1])
+        #
+        #     for el in sorted_results:
+        #         el_name = el[0].capitalize().replace('_', ' ').replace('count', '').rstrip(string.whitespace)
+        #         if not Turn.query.filter_by(game_id=game_id, player_id=self.id, category=el_name).count():
+        #             method_name = el[0]
+        #             break
 
         if results_dict:
-            for el in sorted_results:
+            keys = list(results_dict.keys())
+            random.shuffle(keys)
+            shuffled_results = [(key, results_dict[key]) for key in keys]
+
+            for el in shuffled_results:
                 el_name = el[0].capitalize().replace('_', ' ').replace('count', '').rstrip(string.whitespace)
-                if not Turn.query.filter_by(game_id=game_id, player_id=self.id, category=el[0]).count():
+                if not Turn.query.filter_by(game_id=game_id, player_id=self.id, category=el_name).count():
                     method_name = el[0]
                     break
 
-        if not results_dict:
+        if method_name == '':
             cat_already_chosen = True
             while cat_already_chosen:
-                rand_cat_name = random.choice(zero_results_dict.keys())
+                rand_met_name = random.choice(list(zero_results_dict.keys()))
+                rand_cat_name = rand_met_name.capitalize().replace('_', ' ').replace('count', '').rstrip(string.whitespace)
                 if not Turn.query.filter_by(game_id=game_id, player_id=self.id, category=rand_cat_name).count():
                     cat_already_chosen = False
-                    method_name = rand_cat_name
-                del results_dict[rand_cat_name]
+                    method_name = rand_met_name
+                del zero_results_dict[rand_met_name]
 
 
         getattr(cat, method_name)(last_diceroll)
