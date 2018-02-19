@@ -9,12 +9,15 @@
             {% for player in form.players %}
                 <p>
                     Name {{loop.index}}: {{ player }}
+                    {% for error in form.players[loop.index - 1].errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
                 </p>
             {% endfor %}
         </p>
     {% if cplayers_no %}
         <p>
-            <h2>Computer Players Level</h2> {# todo: nie powinno sie wyswietlac gdy com pl = 0 #}
+            <h2>Computer Players Level</h2>
             {% for subfield in form.computer_ai %}
                <span class="radio"> {{ subfield }} {{ subfield.label }} </span>
             {% endfor %}

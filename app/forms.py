@@ -25,9 +25,10 @@ class RegistrationForm(FlaskForm):
 
 
 class NewGameForm(FlaskForm):
-    human_players = IntegerField('Human Players', widget=widgets.Input(input_type="number"),
+    name = StringField('Name', validators=[DataRequired()])
+    human_players = IntegerField('Human Players', widget=widgets.Input(input_type="number"), default=2,
                                  validators=[NumberRange(min=1, max=10)])
-    computer_players = IntegerField('Computer Players', widget=widgets.Input(input_type="number"),
+    computer_players = IntegerField('Computer Players', widget=widgets.Input(input_type="number"), default=0,
                                     validators=[NumberRange(max=10)])
     submit = SubmitField('Go to game details')
 

@@ -12,7 +12,7 @@
         {% if turn > 1 %}
             <h2>Diceroll 1:</h2>
             <p class="dice-result">
-                {% for dice in dices[0] %} {# todo: chyba mozna tu uzyc context variable zamiast przesylac tu dices #}
+                {% for dice in dices[0] %}
                      <span class="dice">Dice {{loop.index}}:</span> <span class="dice-number-result">{{ dice }}</span>
                 {% endfor %}
             </p>

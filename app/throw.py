@@ -4,6 +4,7 @@ from app.forms import *
 from app.models.diceroll import *
 from app.category import category_blueprint
 from app.models.player import *
+from app.models.game import *
 from flask_login import login_required
 
 app.register_blueprint(category_blueprint)
@@ -14,7 +15,6 @@ throw_blueprint = Blueprint('throw_blueprint', __name__)
 @throw_blueprint.route('/throw/<int:game_id>/<int:player_id>', methods=['GET', 'POST'])
 @login_required
 def throw(game_id, player_id):
-
     turn = 1
     dicerolls_lists = []
     player = Player.query.get(player_id)
@@ -30,7 +30,6 @@ def throw(game_id, player_id):
         return redirect(url_for('category_blueprint.category', game_id=game_id, player_id=player_id))
 
     game = Game.query.get(int(game_id))
-    categories = []
 
     form = ThrowForm()
 
@@ -39,22 +38,9 @@ def throw(game_id, player_id):
 
         if player_id in game.get_list_of_human_players_ids():
 
-            cat_results = player.generate_dict_of_part_results(game_id)
-            category = Category()
+            human_player = HumanPlayer.query.get(int(player_id))
 
-            i = 0
-            for cat in category.category_details:
-                if cat['label'] not in cat_results:
-                    categories.append({'label': '', 'description': '', 'description1': '', 'result': ''})
-                    categories[i]['label'] = cat['label']
-                    categories[i]['description'] = cat['desc1']
-                    categories[i]['description1'] = cat['desc2']
-                    i += 1
-                # if cat['label'] in cat_results:
-                #     # categories[i]['result'] = cat_results[cat['label']]
-                #     del categories[i]
-
-
+            categories = human_player.generate_categories_table_data(game_id)
 
             if form.throw_sel.data:
                 if turn > 1:
@@ -81,15 +67,12 @@ def throw(game_id, player_id):
             dicerolls_lists.append(diceroll.return_dices_as_list())
             turn += 1
 
-            human_player = HumanPlayer.query.get(int(player_id))
-            disabled_categories = list(human_player.generate_dict_of_part_results(game_id).keys())
-
             return render_template('throw.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists,
-                                   disabled_categories=disabled_categories, game_id=game_id,
+                                   game_id=game_id,
                                    player_name=human_player.player_name, categories=categories)
 
         else:
-            computer_player = ComputerPlayer.query.get(int(player_id))  # todo ?...
+            computer_player = ComputerPlayer.query.get(int(player_id))
             curr_computer_player = computer_player.check_ai_and_return_object()
 
             choice = 0
@@ -119,14 +102,14 @@ def throw(game_id, player_id):
                         session['diceroll_3_id'] = diceroll.id
                     turn += 1
 
-                elif isinstance(curr_computer_player, ComputerPlayerSmart):  # todo: sth
+                elif isinstance(curr_computer_player, ComputerPlayerSmart):
                     if turn == 2:
                         diceroll.assign_dices(dicerolls_objects_lists[0])
                     elif turn == 3:
                         diceroll.assign_dices(dicerolls_objects_lists[1])
 
                     dum_comp = ComputerPlayerDummy.query.get(player_id)
-                    ticked_boxes = dum_comp.randomly_select_dices(diceroll, game_id)  # todo:
+                    ticked_boxes = dum_comp.randomly_select_dices(diceroll, game_id)
 
                     dicerolls_lists.append(diceroll.return_dices_as_list())
                     flash('Computer selected dice with number/s: {} to throw again'.format(sorted(ticked_boxes)))
@@ -139,14 +122,13 @@ def throw(game_id, player_id):
                 return render_template('computerthrow.html', title='Throw', form=form, turn=turn,
                                        dices=dicerolls_lists, game_id=game_id, player_name=player.player_name)
 
-            elif (choice == 3) or (turn == 4):  # wybór kategorii
+            elif (choice == 3) or (turn == 4):
                 return redirect(url_for('category_blueprint.category', game_id=game_id, player_id=player_id))
 
     if player_id in game.get_list_of_human_players_ids():
         human_player = HumanPlayer.query.get(int(player_id))
-        disabled_categories = list(human_player.generate_dict_of_part_results(game_id).keys())
         return render_template('throw.html', title='Throw', form=form, turn=turn,
-                               disabled_categories=disabled_categories, game_id=game_id, dices=dicerolls_lists,
+                               game_id=game_id, dices=dicerolls_lists,
                                player_name=human_player.player_name)
     else:
         return render_template('computerthrow.html', title='Throw', form=form, turn=turn, game_id=game_id,

@@ -4,30 +4,16 @@
     <h1>{{ title }}</h1>
     <form action="" method="post">
         {{ form.hidden_tag() }}
-{#        <p>#}
-{#            {{ form.name.label }}#}
-{#            {{ form.name(size=32) }}#}
-{#            {% for error in form.name.errors %}#}
-{#            <span style="color: red;">[{{ error }}]</span>#}
-{#            {% endfor %}#}
-{#        </p>#}
-
-{#        <form class="form-inline">#}
-{#          <div class="form-group">#}
-{#            <label class="sr-only" for="human_playersInput">Human Players No</label>#}
-{#            <input type="number" class="form-control" id="human_playersInput" placeholder="Human Players No">#}
-{#          </div>#}
-{#          <button type="submit" class="btn btn-default">Submit</button>#}
-{#        </form>#}
-{#        <div id="successAlert" class="alert alert-success" role="alert" style="display:none;">#}
-{#        </div>#}
-{#        <div id="errorAlert" class="alert alert-danger" role="alert" style="display:none;"></div>#}
-
+        <p>
+            {{ form.name.label }}
+            {{ form.name(size=32) }}
+            {% for error in form.name.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
         </p>
             {{ form.human_players.label }}
             {{ form.human_players(size=2)}}
-{#            <input name="human_players[]" size="50" type="text">#}
-{#        <input name="human_players[]" size="50" type="text">#}
             {% for error in form.human_players.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}

@@ -65,4 +65,3 @@ class Diceroll(db.Model):
     def throw_all_rand(self, player_id, game_id):
         self.generate_all_rand_dices_and_insert_to_db(player_id, game_id)
         return self.return_dices_as_list()
-

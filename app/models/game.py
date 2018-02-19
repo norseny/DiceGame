@@ -3,6 +3,7 @@ from sqlalchemy import func
 from flask_login import current_user
 from datetime import datetime
 from app.models.diceroll import *
+from app.models.player import *
 
 
 class Player(db.Model):
@@ -77,10 +78,9 @@ class Game(db.Model):
     name = db.Column(db.String(64), unique=True)
     date = db.Column(db.DateTime, default=datetime.now())
 
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
         insert_to_db(self)
-        self.name = current_user.username + "'s game " + 'id ' + str(self.id) #todo: poprawic na wprowadzanie nazwy gry
-        db.session.commit()
 
     def __repr__(self):
         return '<Game {}>'.format(self.name)
@@ -92,7 +92,7 @@ class Game(db.Model):
     def get_list_of_human_players_ids(self):
         players_ids_all = self.get_list_of_all_players_ids()
         players_ids_humans = []
-        for x in players_ids_all:  # TODO zamienic na list comprehension
+        for x in players_ids_all:
             player = Player.query.get(int(x))
             if not player.computer_player:
                 players_ids_humans.append(player.id)
@@ -119,7 +119,7 @@ class Gameresult(db.Model):
     def __repr__(self):
         return '<Gameresult {} {} {}>'.format(self.game_id, self.player_id, self.result)
 
-    def update_results(self, game_id):  # todo: dodatkowe punkty za cośtam
+    def update_results(self, game_id):
         game = Game.query.get(game_id)
         players_ids = game.get_list_of_all_players_ids()
         for player_id in players_ids:

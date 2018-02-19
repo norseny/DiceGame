@@ -67,7 +67,7 @@ def register():
 def newgame():
     form = NewGameForm()
     if form.validate_on_submit():
-        game = Game()
+        game = Game(name=form.name.data)
         session['hplayers'] = form.human_players.data
         flash('New game "{}" created'.format(game.name))
 
@@ -98,8 +98,6 @@ def playersnames(game_id, cplayers_no):
         computer_player = ComputerPlayer()
         computer_player.create_cplayers(game_id, cplayers_no, form.computer_ai.data)
 
-        flash('Players created. The current player is: {}'.format(current_user.username))
-
         return redirect(url_for('throw_blueprint.throw', game_id=game_id, player_id=human_players_ids[0]))
 
     # init the form with name of the user as the first player
@@ -114,7 +112,7 @@ def playersnames(game_id, cplayers_no):
 
 @app.route('/gameend/<int:game_id>/<int:suspend>', methods=['GET', 'POST'])
 @login_required
-def gameend(game_id, suspend=False):  # todo poprawic na game_end
+def gameend(game_id, suspend=False):
 
     gameresults_dict = {}
     if not suspend:
@@ -192,7 +190,7 @@ def showcategory(game_id, player_id):
 
     form = ShowCategoryForm()
     if form.validate_on_submit():
-        if form.submit_next_player.data:  # todo: przycisk label end of the game jak juz wszyscy rzucili
+        if form.submit_next_player.data:
 
             players = game.get_list_of_all_players_ids()
             curr_player_pos = players.index(player_id)

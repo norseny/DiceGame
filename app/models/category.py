@@ -1,11 +1,12 @@
 import random
 from app.models.game import *
 
+
 class Category:
     category_details = [
-        {'label':'Aces', 'desc1':'Any combination','desc2':'The sum of dice with the number 1', 'result':0},
-        {'label':'Twos', 'desc1':'Any combination','desc2':'The sum of dice with the number 2'},
-        {'label':'Threes','desc1': 'Any combination', 'desc2': 'The sum of dice with the number 3'},
+        {'label': 'Aces', 'desc1': 'Any combination', 'desc2': 'The sum of dice with the number 1', 'result': 0},
+        {'label': 'Twos', 'desc1': 'Any combination', 'desc2': 'The sum of dice with the number 2'},
+        {'label': 'Threes', 'desc1': 'Any combination', 'desc2': 'The sum of dice with the number 3'},
         {'label': 'Fours', 'desc1': 'Any combination', 'desc2': 'The sum of dice with the number 4'},
         {'label': 'Fives', 'desc1': 'Any combination', 'desc2': 'The sum of dice with the number 5'},
         {'label': 'Sixes', 'desc1': 'Any combination', 'desc2': 'The sum of dice with the number 6'},
@@ -64,9 +65,9 @@ class Category:
     def small_straight_count(self, diceroll):
         diceroll_set = set(diceroll)
         list_of_sets = []
-        list_of_sets.append(set(range(1,5)))
-        list_of_sets.append(set(range(2,6)))
-        list_of_sets.append(set(range(3,7)))
+        list_of_sets.append(set(range(1, 5)))
+        list_of_sets.append(set(range(2, 6)))
+        list_of_sets.append(set(range(3, 7)))
         for my_set in list_of_sets:
             if self.check_if_subset(diceroll_set, my_set):
                 self.result = 30
