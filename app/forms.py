@@ -42,7 +42,7 @@ class NewGameForm(FlaskForm):
 class PlayersNamesForm(FlaskForm):
     players = FieldList(StringField('Name'), min_entries=1, max_entries=10)
     computer_ai = RadioField('Computer Players Level',
-                             choices=[('Dummy', 'Dummy computers'), ('Smart', 'Smart Computers')], default='Dummy')
+                             choices=[('Dummy', 'Dummy computers'), ('Smart', 'Smart computers')], default='Dummy')
     throw = SubmitField('Let the first player throw!')
 
 
