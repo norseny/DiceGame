@@ -129,14 +129,3 @@ class ComputerPlayerSmart(ComputerPlayer):
                     picked_category['name'] = category_name.rstrip(string.whitespace)
                     picked_category['result'] = category[1]
                     return picked_category
-
-                    # def count_points(self, diceroll):
-                    #         cat = Category()
-                    #         methods = [a for a in dir(cat) if not a.startswith('__') and callable(getattr(cat, a)) if 'count' in a]
-                    #         results ={'best':[0, 'methodname']}
-                    #         for method in methods:
-                    #             getattr(cat, method)(diceroll)
-                    #             results[method] = cat.result
-                    #             if cat.result > results['best'][0]:
-                    #                 results['best'] = [cat.result, method]
-                    #         return results

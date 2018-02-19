@@ -209,20 +209,3 @@ def showcategory(game_id, player_id):
                            last_diceroll=last_diceroll, total=total, comp_last_cat=comp_last_cat, categories=categories,
                            game_id=game_id, human_last_cat=human_last_cat)
 
-# @app.route('/process', methods=['POST'])
-# def process():
-#
-#     human_players = request.form['human_players']
-#
-#     if human_players:
-#         success = str(human_players)
-#
-#         return jsonify({'name': success})
-#     return jsonify({'error': 'Missing data!'})
-#
-#
-# @app.route('/_add_numbers')
-# def add_numbers():
-#     a = request.args.get('a', 0, type=int)
-#     b = request.args.get('b', 0, type=int)
-#     return jsonify(result=a + b)

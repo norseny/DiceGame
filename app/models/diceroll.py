@@ -1,7 +1,6 @@
 from app import db
 import random
 from app.models import game as models
-from flask import session
 
 
 class Diceroll(db.Model):
