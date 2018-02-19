@@ -64,16 +64,6 @@ class ComputerPlayerDummy(ComputerPlayer):
 
         method_name = ''
 
-        # lower graded categories first (but all higher than 0)
-        # if results_dict:
-        #     sorted_results = sorted(results_dict.items(), key=lambda x: x[1])
-        #
-        #     for el in sorted_results:
-        #         el_name = el[0].capitalize().replace('_', ' ').replace('count', '').rstrip(string.whitespace)
-        #         if not Turn.query.filter_by(game_id=game_id, player_id=self.id, category=el_name).count():
-        #             method_name = el[0]
-        #             break
-
         if results_dict:
             keys = list(results_dict.keys())
             random.shuffle(keys)

@@ -15,14 +15,10 @@ throw_blueprint = Blueprint('throw_blueprint', __name__)
 @login_required
 def throw(game_id, player_id):
 
-    turn = 1 #todo: z rezultatów człowieka od razu przeskakuje do wybranej kategorii - gdzieś nie wrzuca do bazy do
-    # Turn
-    # rzuconych
-    #  kosci, sa nieprzypisane  i stad blad
+    turn = 1
     dicerolls_lists = []
     player = Player.query.get(player_id)
     dicerolls_objects_lists = player.find_unassigned_dicerolls(game_id)
-    # dicerolls_objects_lists.sort() #todo: być moze trzeba zrobic posortowaną liste obiektów
 
     for diceroll in dicerolls_objects_lists:
         dicerolls_lists.append(diceroll.return_dices_as_list())
@@ -31,20 +27,34 @@ def throw(game_id, player_id):
         turn = len(dicerolls_lists) + 1
 
     if turn > 3:
-        # return redirect(url_for('category_blueprint.category', game_id=game_id, player_id=player_id, diceroll_id_1=0, diceroll_id_2=0, diceroll_id_3=0))
         return redirect(url_for('category_blueprint.category', game_id=game_id, player_id=player_id))
 
-
     game = Game.query.get(int(game_id))
+    categories = []
 
     form = ThrowForm()
-    # if turn >= 1:
-    #     form.throw_all.label.text = "To throw all five dice again click here or reload the page"
 
     if form.validate_on_submit():
         diceroll = Diceroll()
 
         if player_id in game.get_list_of_human_players_ids():
+
+            cat_results = player.generate_dict_of_part_results(game_id)
+            category = Category()
+
+            i = 0
+            for cat in category.category_details:
+                if cat['label'] not in cat_results:
+                    categories.append({'label': '', 'description': '', 'description1': '', 'result': ''})
+                    categories[i]['label'] = cat['label']
+                    categories[i]['description'] = cat['desc1']
+                    categories[i]['description1'] = cat['desc2']
+                    i += 1
+                # if cat['label'] in cat_results:
+                #     # categories[i]['result'] = cat_results[cat['label']]
+                #     del categories[i]
+
+
 
             if form.throw_sel.data:
                 if turn > 1:
@@ -76,7 +86,7 @@ def throw(game_id, player_id):
 
             return render_template('throw.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists,
                                    disabled_categories=disabled_categories, game_id=game_id,
-                                   player_name=human_player.player_name)
+                                   player_name=human_player.player_name, categories=categories)
 
         else:
             computer_player = ComputerPlayer.query.get(int(player_id))  # todo ?...

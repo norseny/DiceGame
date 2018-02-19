@@ -54,22 +54,42 @@
                 {{ form.keep() }}
             </p>
         {% endif %}
+        {% if turn == 4 %}
+            {{ form.cat_sel() }} {# todo moze zamienic na keep, po co 2 submity, jak moze mozna zmienic label#}
+        {% endif %}
         {% if turn < 4 %}
             <p>
                 {{ form.throw_all() }}
             </p>
         {% endif %}
-        {% if turn == 4 %}
-            {{ form.cat_sel() }} {# todo moze zamienic na keep, po co 2 submity, jak moze mozna zmienic label#}
-        {% endif %}
-        {% if turn != 1 %}
-            {% if disabled_categories %}
-                <p>
-                    The following categories will be disabled in the category choice: {{ disabled_categories }}
-                </p>
-            {% endif %}
+
+        {% if turn != 1 and turn != 4%}
+            <div>
+                <button type="button" onclick="myFunction()">Show or hide my available categories</button>
+            </div>
+
+            <table id="my-results" style="display: none;" >
+                <thead>
+                    <tr>
+                        <td>Name</td>
+                        <td>Combination</td>
+                        <td>How counted</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for el in categories %}
+                        <tr>
+                            <td>{{ el['label'] }}</td>
+                            <td>{{ el['description'] }}</td>
+                            <td>{{ el['description1'] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         {% endif %}
     </form>
+
+
     <div class="footer">
         Do you want to:
         <span>
@@ -79,4 +99,15 @@
             <a href="{{ url_for('gameend', game_id=game_id, suspend=1) }}">...suspend the game?</a>
         </span>
     </div>
+
+    <script>
+    function myFunction() {
+        var x = document.getElementById("my-results");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+    </script>
 {% endblock %}
