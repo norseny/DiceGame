@@ -3,7 +3,7 @@ from sqlalchemy import func
 from flask_login import current_user
 from datetime import datetime
 from app.models.diceroll import *
-from app.models.player import *
+#from app.models.player import *
 
 
 class Player(db.Model):

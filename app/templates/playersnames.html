@@ -9,9 +9,6 @@
             {% for player in form.players %}
                 <p>
                     Name {{loop.index}}: {{ player }}
-                    {% for error in form.players[loop.index - 1].errors %}
-                        <span style="color: red;">[{{ error }}]</span>
-                    {% endfor %}
                 </p>
             {% endfor %}
         </p>

@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, RadioField, FieldList
 from wtforms.validators import DataRequired, ValidationError, EqualTo, NumberRange
 from app.models.user import *
+from app.models.game import *
 import wtforms.widgets as widgets
 
 
@@ -32,9 +33,14 @@ class NewGameForm(FlaskForm):
                                     validators=[NumberRange(max=10)])
     submit = SubmitField('Go to game details')
 
+    def validate_name(self, name):
+        game = Game.query.filter_by(name=name.data).first()
+        if game is not None:
+            raise ValidationError('Please use different name.')
+
 
 class PlayersNamesForm(FlaskForm):
-    players = FieldList(StringField('Name', validators=[DataRequired()]), min_entries=1, max_entries=10)
+    players = FieldList(StringField('Name'), min_entries=1, max_entries=10)
     computer_ai = RadioField('Computer Players Level',
                              choices=[('Dummy', 'Dummy computers'), ('Smart', 'Smart Computers')], default='Dummy')
     throw = SubmitField('Let the first player throw!')
