@@ -21,6 +21,17 @@ class ComputerPlayer(Player):
             computer_player = ComputerPlayer(player_name=str(computer_ai_type)+' Computer Player '+str(comp), computer_player=True)
             computer_player.insert_player_to_db(game_id)
 
+    def count_points(self, diceroll):
+            cat = Category()
+            methods = [a for a in dir(cat) if not a.startswith('__') and callable(getattr(cat, a)) if 'count' in a]
+            results ={'best':[0, 'methodname']}
+            for method in methods:
+                getattr(cat, method)(diceroll)
+                results[method] = cat.result
+                if cat.result > results['best'][0]:
+                    results['best'] = [cat.result, method]
+            return results
+
 
 class ComputerPlayerDummy(ComputerPlayer):
 
@@ -40,16 +51,40 @@ class ComputerPlayerDummy(ComputerPlayer):
         cat = Category()
         picked_category = {}
 
-        cat_already_chosen = True
-        while cat_already_chosen:
-            rand_cat_name = cat.category_details[random.randint(0, 12)]['label']
-            if not Turn.query.filter_by(game_id=game_id, player_id=self.id, category=rand_cat_name).count():
-                cat_already_chosen = False
-                method_name = (rand_cat_name.lower()).replace(' ', '_')
+        results_dict = self.count_points(last_diceroll)
+        zero_results_dict = {}
+        del results_dict['best']
 
-        getattr(cat, method_name + '_count')(last_diceroll)
+        for key, value in results_dict.items():
+            if value == 0:
+                zero_results_dict[key] = value
+
+        for key in zero_results_dict.keys():
+            del results_dict[key]
+
+        sorted_results = sorted(results_dict.items(), key=lambda x: x[1])
+
+        if results_dict:
+            for el in sorted_results:
+                el_name = el[0].capitalize().replace('_', ' ').replace('count', '').rstrip(string.whitespace)
+                if not Turn.query.filter_by(game_id=game_id, player_id=self.id, category=el[0]).count():
+                    method_name = el[0]
+                    break
+
+        if not results_dict:
+            cat_already_chosen = True
+            while cat_already_chosen:
+                rand_cat_name = random.choice(zero_results_dict.keys())
+                if not Turn.query.filter_by(game_id=game_id, player_id=self.id, category=rand_cat_name).count():
+                    cat_already_chosen = False
+                    method_name = rand_cat_name
+                del results_dict[rand_cat_name]
+
+
+        getattr(cat, method_name)(last_diceroll)
         picked_category['result'] = cat.result
-        picked_category['name'] = rand_cat_name.rstrip(string.whitespace)
+        cat_name = method_name.capitalize().replace('_', ' ').replace('count', '').rstrip(string.whitespace)
+        picked_category['name'] = cat_name
 
         return picked_category
 
@@ -75,13 +110,13 @@ class ComputerPlayerSmart(ComputerPlayer):
                     picked_category['result'] = category[1]
                     return picked_category
 
-    def count_points(self, diceroll):
-            cat = Category()
-            methods = [a for a in dir(cat) if not a.startswith('__') and callable(getattr(cat, a)) if 'count' in a]
-            results ={'best':[0, 'methodname']}
-            for method in methods:
-                getattr(cat, method)(diceroll)
-                results[method] = cat.result
-                if cat.result > results['best'][0]:
-                    results['best'] = [cat.result, method]
-            return results
+    # def count_points(self, diceroll):
+    #         cat = Category()
+    #         methods = [a for a in dir(cat) if not a.startswith('__') and callable(getattr(cat, a)) if 'count' in a]
+    #         results ={'best':[0, 'methodname']}
+    #         for method in methods:
+    #             getattr(cat, method)(diceroll)
+    #             results[method] = cat.result
+    #             if cat.result > results['best'][0]:
+    #                 results['best'] = [cat.result, method]
+    #         return results

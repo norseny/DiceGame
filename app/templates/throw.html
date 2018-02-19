@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <div class="to-right">{{ player_name }} playing </div>
     {% if turn < 4 %}
         <h1>Throw the dice</h1>
     {% elif turn == 4 %}
@@ -41,7 +42,7 @@
                 <span class="dice-choose">{{ form.dice2.description }}{{ form.dice2 }}</span>
                 <span class="dice-choose">{{ form.dice3.description }}{{ form.dice3 }}</span>
                 <span class="dice-choose">{{ form.dice4.description }}{{ form.dice4 }}</span>
-                <span class="dice-choose">{{ form.dice5.description }}{{ form.dice5 }}</span>
+                <span class="dice-choose">{{ form.dice5.description }}{{ form.dice5 }}</span>{{ form.throwNumber }}
             </p>
             <p>
                 {{ form.dices }}

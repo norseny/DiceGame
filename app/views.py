@@ -133,14 +133,14 @@ def gameend(game_id, suspend=False):  # todo poprawic na game_end
     return render_template('gameend.html', title='End of the game', gameresults_dict=gameresults_dict, suspend=suspend)
 
 
-@app.route('/suspended_games', methods=['GET', 'POST'])
+@app.route('/suspendedgames', methods=['GET', 'POST'])
 @login_required
-def suspended_games():
-
+def suspendedgames():
     games = {}
     human_player = Player.query.filter_by(user_id=current_user.id).first()
     if human_player != None:
-        player_unfinished_games = dict(Gameresult.query.filter_by(player_id=human_player.id, result=None).add_columns(Gameresult.game_id).all())
+        player_unfinished_games = dict(
+            Gameresult.query.filter_by(player_id=human_player.id, result=None).add_columns(Gameresult.game_id).all())
 
         for game_id in player_unfinished_games.values():
             unassingned_dicerolls_list = human_player.find_unassigned_dicerolls(game_id)
@@ -152,8 +152,64 @@ def suspended_games():
             games[el].append(query.count())
             games[el].append(query.with_entities(func.sum(Turn.part_result)).scalar())
 
-    return render_template('suspended_games.html', title='Suspended games',
+    return render_template('suspendedgames.html', title='Suspended games',
                            games=games, isinstance=isinstance, datetime=datetime, human_player=human_player)
+
+
+@app.route('/showcategory/<int:game_id>/<int:player_id>', methods=['GET', 'POST'])
+@login_required
+def showcategory(game_id, player_id):
+    game = Game.query.get(int(game_id))
+    player = Player.query.get(int(player_id))
+    last_turn = Turn.query.filter_by(game_id=game_id, player_id=player_id).order_by(Turn.id.desc()).first()
+
+    comp_last_cat, human_last_cat = 0, 0
+    if player.computer_player:
+        comp_last_cat = last_turn.category
+    else:
+        human_last_cat = last_turn.category
+
+    last_diceroll_obj = Diceroll.query.filter_by(game_id=game_id, player_id=player_id).order_by(
+        Diceroll.id.desc()).first()
+    last_diceroll = last_diceroll_obj.return_dices_as_list()
+
+    cat_results = player.generate_dict_of_part_results(game_id)
+    categories = []
+    category = Category()
+
+    for i, cat in enumerate(category.category_details):
+        categories.append({'label': '', 'description': '', 'description1': '', 'result': ''})
+        categories[i]['label'] = cat['label']
+        categories[i]['description'] = cat['desc1']
+        categories[i]['description1'] = cat['desc2']
+        if cat['label'] in cat_results:
+            categories[i]['result'] = cat_results[cat['label']]
+
+    total = 0
+    for el in categories:
+        if el['result'] != '':
+            total += int(el['result'])
+
+    form = ShowCategoryForm()
+    if form.validate_on_submit():
+        if form.submit_next_player.data:  # todo: przycisk label end of the game jak juz wszyscy rzucili
+
+            players = game.get_list_of_all_players_ids()
+            curr_player_pos = players.index(player_id)
+
+            if curr_player_pos != len(players) - 1:
+                player_id = players[int(curr_player_pos + 1)]
+            else:
+                if 13 == player.get_no_of_turns(game_id):
+                    return redirect(url_for('gameend', game_id=game_id, suspend=False))
+                else:
+                    player_id = players[0]
+
+            return redirect(url_for('throw_blueprint.throw', game_id=game_id, player_id=player_id))
+
+    return render_template('showcategory.html', title='The results', form=form, player_name=player.player_name,
+                           last_diceroll=last_diceroll, total=total, comp_last_cat=comp_last_cat, categories=categories,
+                           game_id=game_id, human_last_cat=human_last_cat)
 
 # @app.route('/process', methods=['POST'])
 # def process():

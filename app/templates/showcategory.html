@@ -1,18 +1,20 @@
 {% extends "base.html" %}
 
 {%  block content %}
-    <h1>{{ title }}</h1>
+        <h1>{{ title }}</h1>
+    {% if comp_last_cat %}
         <p>
-            {{ player_name }}, your last diceroll is: {{ last_diceroll }}
+            '{{ player_name }}'s last diceroll was: {{ last_diceroll }}. Its category choice was '{{ comp_last_cat }}'.
         </p>
-
-    <form action="" method="post">
-        {{ form.hidden_tag() }}
+    {% else %}
+        <p>
+            {{ player_name }}, your last diceroll was: {{ last_diceroll }}. Your last category choice was '{{ human_last_cat }}'.
+        </p>
+    {% endif %}
 
         <table>
             <thead>
                 <tr>
-                    <td class="hide_me">Select</td>
                     <td>Name</td>
                     <td>Combination</td>
                     <td>How counted</td>
@@ -21,7 +23,6 @@
             </thead>
             <tfoot>
                 <tr class="foot">
-                    <td class="foot hide_me"></td>
                     <td class="foot"></td>
                     <td class="foot cat-descrisum(choices.result())ption"></td>
                     <td class="foot total cat-description">Total:</td>
@@ -29,24 +30,24 @@
                 </tr>
             </tfoot>
             <tbody>
-                {% for radio in choices %}
+                {% for el in categories %}
                     <tr>
-                        {% if hasattr(radio, 'result') %}
-                            <td></td>
-                        {% else %}
-                            <td>{{ radio }}</td>
-                        {% endif %}
-                        <td>{{ radio.label }}</td>
-                        <td>{{ radio.description }}</td>
-                        <td>{{ radio.description1 }}</td>
-                        <td>{{ radio.result }}</td>
+                        <td>{{ el['label'] }}</td>
+                        <td>{{ el['description'] }}</td>
+                        <td>{{ el['description1'] }}</td>
+                        <td>{{ el['result'] }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
+
+        <form action="" method="post">
+        {{ form.hidden_tag() }}
         <p>
-            <span> {{ form.submit_the_box() }} </span>
+            {{ form.submit_next_player() }}
         </p>
+
+
     </form>
     <div class="footer">
         Do you want to:

@@ -15,7 +15,10 @@ throw_blueprint = Blueprint('throw_blueprint', __name__)
 @login_required
 def throw(game_id, player_id):
 
-    turn = 1
+    turn = 1 #todo: z rezultatów człowieka od razu przeskakuje do wybranej kategorii - gdzieś nie wrzuca do bazy do
+    # Turn
+    # rzuconych
+    #  kosci, sa nieprzypisane  i stad blad
     dicerolls_lists = []
     player = Player.query.get(player_id)
     dicerolls_objects_lists = player.find_unassigned_dicerolls(game_id)
@@ -28,10 +31,15 @@ def throw(game_id, player_id):
         turn = len(dicerolls_lists) + 1
 
     if turn > 3:
-        return redirect(url_for('category_blueprint.category', game_id=game_id, player_id=player_id, diceroll_id_1=0, diceroll_id_2=0, diceroll_id_3=0))
+        # return redirect(url_for('category_blueprint.category', game_id=game_id, player_id=player_id, diceroll_id_1=0, diceroll_id_2=0, diceroll_id_3=0))
+        return redirect(url_for('category_blueprint.category', game_id=game_id, player_id=player_id))
+
 
     game = Game.query.get(int(game_id))
+
     form = ThrowForm()
+    # if turn >= 1:
+    #     form.throw_all.label.text = "To throw all five dice again click here or reload the page"
 
     if form.validate_on_submit():
         diceroll = Diceroll()
@@ -67,7 +75,8 @@ def throw(game_id, player_id):
             disabled_categories = list(human_player.generate_dict_of_part_results(game_id).keys())
 
             return render_template('throw.html', title='Throw', form=form, turn=turn, dices=dicerolls_lists,
-                                   disabled_categories=disabled_categories, game_id=game_id)
+                                   disabled_categories=disabled_categories, game_id=game_id,
+                                   player_name=human_player.player_name)
 
         else:
             computer_player = ComputerPlayer.query.get(int(player_id))  # todo ?...
@@ -80,16 +89,10 @@ def throw(game_id, player_id):
 
             if (turn == 1) or (choice == 1):  # choice = 1 oznacza rzut wszystkimi
                 dicerolls_lists.append(diceroll.throw_all_rand(player_id, game_id))
-                if 'diceroll_1_id' not in session:
-                    session['diceroll_1_id'] = diceroll.id
-                elif 'diceroll_2_id' not in session:
-                    session['diceroll_2_id'] = diceroll.id
-                else:
-                    session['diceroll_3_id'] = diceroll.id
                 flash('All dices thrown')
                 turn += 1
                 return render_template('computerthrow.html', title='Throw', form=form, turn=turn,
-                                       dices=dicerolls_lists, game_id=game_id)
+                                       dices=dicerolls_lists, game_id=game_id, player_name=player.player_name)
 
             elif (choice == 2) and ((turn == 2) or (turn == 3)):  # wybór czym rzucić
                 if isinstance(curr_computer_player, ComputerPlayerDummy):
@@ -124,7 +127,7 @@ def throw(game_id, player_id):
                     turn += 1
 
                 return render_template('computerthrow.html', title='Throw', form=form, turn=turn,
-                                       dices=dicerolls_lists, game_id=game_id)
+                                       dices=dicerolls_lists, game_id=game_id, player_name=player.player_name)
 
             elif (choice == 3) or (turn == 4):  # wybór kategorii
                 return redirect(url_for('category_blueprint.category', game_id=game_id, player_id=player_id))
@@ -132,6 +135,9 @@ def throw(game_id, player_id):
     if player_id in game.get_list_of_human_players_ids():
         human_player = HumanPlayer.query.get(int(player_id))
         disabled_categories = list(human_player.generate_dict_of_part_results(game_id).keys())
-        return render_template('throw.html', title='Throw', form=form, turn=turn, disabled_categories=disabled_categories, game_id=game_id, dices=dicerolls_lists)
+        return render_template('throw.html', title='Throw', form=form, turn=turn,
+                               disabled_categories=disabled_categories, game_id=game_id, dices=dicerolls_lists,
+                               player_name=human_player.player_name)
     else:
-        return render_template('computerthrow.html', title='Throw', form=form, turn=turn, game_id=game_id)
+        return render_template('computerthrow.html', title='Throw', form=form, turn=turn, game_id=game_id,
+                               player_name=player.player_name, dices=dicerolls_lists)

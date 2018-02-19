@@ -15,16 +15,17 @@ class Player(db.Model):
         return '<Player {}>'.format(self.player_name)
 
     def insert_part_result(self, game_id, cat_name, cat_result, diceroll_1_id, diceroll_2_id, diceroll_3_id):
-        turn = Turn(
-            player_id=self.id,
-            game_id=game_id,
-            diceroll1_id=diceroll_1_id,
-            diceroll2_id=diceroll_2_id,
-            diceroll3_id=diceroll_3_id,
-            category=cat_name,
-            part_result=cat_result
-        )
-        insert_to_db(turn)
+        if not Turn.query.filter_by(game_id=game_id, player_id=self.id, category=cat_name).count():
+            turn = Turn(
+                player_id=self.id,
+                game_id=game_id,
+                diceroll1_id=diceroll_1_id,
+                diceroll2_id=diceroll_2_id,
+                diceroll3_id=diceroll_3_id,
+                category=cat_name,
+                part_result=cat_result
+            )
+            insert_to_db(turn)
 
     def generate_dict_of_part_results(self, game_id):
         return dict(Turn.query.with_entities(Turn.category, Turn.part_result).filter_by(game_id=game_id,
@@ -47,17 +48,6 @@ class Player(db.Model):
         insert_to_db(game_result)
 
     def remove_unassigned_dicerolls(self, dicerolls_to_remove):
-
-        # player_dicerolls = Diceroll.query.filter_by(game_id=game_id, player_id=self.id).all()
-        # player_turn_dicerolls = Turn.query.filter_by(game_id=game_id, player_id=self.id).add_columns(
-        #     Turn.diceroll1_id, Turn.diceroll2_id, Turn.diceroll3_id).all()
-        #
-        # player_turn_dicerolls_ids = []
-        # for el in player_turn_dicerolls:
-        #     player_turn_dicerolls_ids.append(el.diceroll1_id)
-        #     player_turn_dicerolls_ids.append(el.diceroll2_id)
-        #     player_turn_dicerolls_ids.append(el.diceroll3_id)
-
         for diceroll in dicerolls_to_remove:
             db.session.delete(diceroll)
             db.session.commit()

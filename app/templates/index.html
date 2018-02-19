@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Dice Game! Play, {{ current_user.username }}!</h1>
+    <h1>Dice Game - play, {{ current_user.username }}!</h1>
     <p class="click-to-play">New Game? <a href="{{ url_for('newgame') }}"> Click to Play!</a></p>
-    <p><a href="{{ url_for('suspended_games') }}">Your suspended games</a></p>
+    <p><a href="{{ url_for('suspendedgames') }}">Your suspended games</a></p>
     <h2>How to play Dice game - Yahtzee</h2>
         <p>
         The object of Yahtzee is to obtain the highest score from throwing 5 dice.
