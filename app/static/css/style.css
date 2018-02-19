@@ -174,8 +174,10 @@ caption {
     color: #1f1f1f;
 }
 
-. to-right {
+#text-to-right,
+#comp_text-to-right{
     text-align: right;
+    color: #5c415d;
 }
 
 #my-results {

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {%  block content %}
-    <div class="to-right">{{ player_name }} playing </div>
+    <div id="comp_text-to-right">{{ player_name }} playing </div>
     {% if turn < 4 %}
         <h1>Throw the dice</h1>
     {% elif turn == 4 %}
