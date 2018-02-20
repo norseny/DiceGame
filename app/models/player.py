@@ -129,3 +129,25 @@ class ComputerPlayerSmart(ComputerPlayer):
                     picked_category['name'] = category_name.rstrip(string.whitespace)
                     picked_category['result'] = category[1]
                     return picked_category
+
+    def decide(self, diceroll):
+        if len(set(diceroll)) <= 2:
+            return 3
+        else:
+            return random.randint(1, 3)
+
+    # def choose_which_dices_to_select(self, prev_diceroll, game_id):
+    #     prev_dices_no_list = prev_diceroll.return_dices_as_list()
+    #     if len(set(prev_dices_no_list)) == 1:
+    #
+    #
+    #     # how_many_to_select = random.randint(1, 4)
+    #     # return random.sample(range(1, 5), how_many_to_select)
+    #     ticked_boxes = self.random_selection_of_dices()
+    #
+    #     sel_dices = [False for x in range(1, 6)]
+    #     for i in ticked_boxes:
+    #         sel_dices[i] = True
+    #     diceroll.check_selected_get_random_numbers_and_insert(sel_dices, self.id, game_id)
+    #     return [x + 1 for x in ticked_boxes]
+

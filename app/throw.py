@@ -37,9 +37,7 @@ def throw(game_id, player_id):
         diceroll = Diceroll()
 
         if player_id in game.get_list_of_human_players_ids():
-
             human_player = HumanPlayer.query.get(int(player_id))
-
             categories = human_player.generate_categories_table_data(game_id)
 
             if form.throw_sel.data:
@@ -78,7 +76,14 @@ def throw(game_id, player_id):
             choice = 0
 
             if (turn == 2) or (turn == 3):
-                choice = random.randint(1, 3)
+                if isinstance(curr_computer_player, ComputerPlayerSmart):
+                    if turn == 2:
+                        diceroll.assign_dices(dicerolls_objects_lists[0])
+                    elif turn == 3:
+                        diceroll.assign_dices(dicerolls_objects_lists[1])
+                    choice = curr_computer_player.decide(diceroll.return_dices_as_list())
+                elif isinstance(curr_computer_player, ComputerPlayerDummy):
+                    choice = random.randint(1, 3)
 
             if (turn == 1) or (choice == 1):  # choice = 1 oznacza rzut wszystkimi
                 dicerolls_lists.append(diceroll.throw_all_rand(player_id, game_id))
@@ -110,6 +115,8 @@ def throw(game_id, player_id):
 
                     dum_comp = ComputerPlayerDummy.query.get(player_id)
                     ticked_boxes = dum_comp.randomly_select_dices(diceroll, game_id)
+
+                    #ticked_boxes = curr_computer_player.choose_which_dices_to_select(diceroll, game_id)
 
                     dicerolls_lists.append(diceroll.return_dices_as_list())
                     flash('Computer selected dice with number/s: {} to throw again'.format(sorted(ticked_boxes)))
